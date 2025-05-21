@@ -1,0 +1,11 @@
+# Set default behavior for all files
+* text=auto
+
+# Explicitly declare text files to use LF
+*.js text eol=lf
+*.json text eol=lf
+*.sh text eol=lf
+
+# Binary files (don't change)
+*.png binary
+*.jpg binary
