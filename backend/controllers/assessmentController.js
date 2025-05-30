@@ -1,6 +1,6 @@
 // controllers/assessmentController.js
 const Assessment = require("../models/Assessment");
-const Submission = require("../models/Submission");
+const Submission = require("../models/Submissions");
 
 // GET /api/assessment/:moduleId
 exports.getAssessmentByModule = async (req, res) => {

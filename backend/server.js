@@ -4,7 +4,7 @@ const connectDB = require("./config/db");
 const userRoutes = require("./Routes/userRoutes");
 const moduleRoutes = require("./Routes/moduleRoutes");
 const progressRoutes = require("./Routes/progressRoutes");
-const assessmentRoutes = require("./Routes/assessmentRoutes");
+const assessmentRoutes = require("./Routes/assesmentRoutes");
 
 dotenv.config();
 connectDB();
