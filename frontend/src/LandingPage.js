@@ -2,16 +2,81 @@ import React, { useState } from "react";
 
 const LandingPage = () => {
   const [isLogin, setIsLogin] = useState(true);
-
+  /*
   const handleLoginSubmit = (e) => {
     e.preventDefault();
     alert("Login submitted");
   };
+  */
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
 
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try {
+      const response = await fetch("http://localhost:5000/api/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || "Login failed");
+      } else {
+        alert("Login successful!");
+
+        // You might want to save token or user info in localStorage or context
+        localStorage.setItem("userToken", data.token); // assuming backend sends token
+        // Then redirect user or update UI accordingly
+      }
+    } catch (error) {
+      alert("Error: " + error.message);
+    }
+  };
+
+  /*
   const handleSignupSubmit = (e) => {
     e.preventDefault();
     alert("Signup submitted");
   };
+  */
+  const handleSignupSubmit = async (e) => {
+    e.preventDefault();
+
+    // get values from form inputs by id
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("emailSignup").value;
+    const password = document.getElementById("passwordSignup").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/api/users/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || "Signup failed");
+      } else {
+        alert("Signup successful! You can now login.");
+        setIsLogin(true); // switch to login form after signup
+      }
+    } catch (error) {
+      alert("Error: " + error.message);
+    }
+  };
+
 
   return (
     <div
