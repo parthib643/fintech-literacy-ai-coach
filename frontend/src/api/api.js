@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base URL
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api', // update here this with  backend URL
+  baseURL: 'http://localhost:5000/api', // update here this with  backend URL
   headers: {
     'Content-Type': 'application/json',
   },
@@ -10,17 +10,19 @@ const api = axios.create({
 
 // Authentication endpoints
 export const register = async (userData) => {
+    console.log("🚀 Sending register data:", userData);  // Frontend log
   try {
-    const response = await api.post('/auth/register', userData);
+    const response = await api.post('/users/register', userData);
     return response.data;
   } catch (error) {
+    console.error("❌ Register API error:", error);
     throw error.response?.data || error.message;
   }
 };
 
 export const login = async (credentials) => {
   try {
-    const response = await api.post('/auth/login', credentials);
+    const response = await api.post('/users/login', credentials);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;
