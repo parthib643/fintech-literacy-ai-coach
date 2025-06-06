@@ -308,7 +308,7 @@ const Dashboard = () => {
                   {/* Learning Path */}
                   {path && (
                     <Grid item xs={12} md={4}>
-                      <Paper sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                      <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '90%' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                           <TimelineIcon sx={{ mr: 1 }} color="primary" />
                           <Typography variant="h6">Your Learning Path</Typography>

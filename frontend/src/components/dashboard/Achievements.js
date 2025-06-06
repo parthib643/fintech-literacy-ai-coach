@@ -32,7 +32,7 @@ const Achievements = () => {
       try {
         setLoading(true);
         const response = await api.get(`/users/${user._id}/achievements`);
-        setAchievements(response.data);
+        setAchievements(response.data.unlockedAchievements || []);
       } catch (err) {
         console.error('Error fetching achievements:', err);
         setError('Failed to load achievements. Please try again.');
@@ -92,7 +92,10 @@ const Achievements = () => {
 
   // Mark achievements as unlocked based on user's achievements
   const displayAchievements = allAchievements.map(achievement => {
-    const userAchievement = achievements.find(a => a.title === achievement.title);
+    // Make sure achievements is an array before using find
+    const userAchievement = Array.isArray(achievements) 
+      ? achievements.find(a => a.title === achievement.title)
+      : null;
     return {
       ...achievement,
       unlocked: !!userAchievement,

@@ -6,17 +6,14 @@ import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Dashboard from './components/dashboard/Dashboard';
 import Module from './components/modules/Module';
+import ModuleList from './components/modules/ModuleList';          
+import ModuleDetail from './components/modules/ModuleDetail';      
 import Assessment from './components/modules/Assessment';
 
 function App() {
-  // Protected route component moved inside App function
   const ProtectedRoute = ({ children }) => {
     const { user } = useAuth();
-    
-    if (!user) {
-      return <Navigate to="/" replace />;
-    }
-    
+    if (!user) return <Navigate to="/" replace />;
     return children;
   };
 
@@ -27,12 +24,24 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+
+          {/* Protected Routes */}
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <Dashboard />
             </ProtectedRoute>
           } />
-          <Route path="/module/:moduleId" element={
+          <Route path="/modules" element={
+            <ProtectedRoute>
+              <ModuleList />
+            </ProtectedRoute>
+          } />
+          <Route path="/modules/:id" element={
+            <ProtectedRoute>
+              <ModuleDetail />
+            </ProtectedRoute>
+          } />
+          <Route path="/modules/:moduleId" element={
             <ProtectedRoute>
               <Module />
             </ProtectedRoute>
