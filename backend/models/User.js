@@ -5,6 +5,10 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+
+  // 🔽 Add these fields to support learning path logic
+  completedModules: { type: Number, default: 0 },
+  score: { type: Number, default: 0 }, // Average or total score in quizzes
 });
 
 // Hash password before saving

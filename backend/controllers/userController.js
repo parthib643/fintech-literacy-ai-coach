@@ -7,12 +7,7 @@ const generateToken = (id) => {
 
 exports.registerUser = async (req, res) => {
   const { name, email, password } = req.body;
-  console.log("REQ.BODY", req.body);
-  
   try {
-    if (!name || !email || !password) {
-       return res.status(400).json({ message: "All fields are required" });
-    }
     const userExists = await User.findOne({ email });
     if (userExists) return res.status(400).json({ message: "User already exists" });
 

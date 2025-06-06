@@ -55,7 +55,7 @@ const seedAchievements = [
 ];
 
 const importData = async () => {
-    console.log("🚀 Running seed script...");
+    console.log("Running seed script...");
   try {
     await Module.deleteMany();
     await Assessment.deleteMany();
@@ -68,10 +68,10 @@ const importData = async () => {
     await Assessment.insertMany(seedAssessments);
     await Achievement.insertMany(seedAchievements);
 
-    console.log("✅ Dummy data seeded successfully!");
+    console.log("Dummy data seeded successfully!");
     process.exit();
   } catch (error) {
-    console.error("❌ Seeding failed:", error);
+    console.error("Seeding failed:", error);
     process.exit(1);
   }
 };
