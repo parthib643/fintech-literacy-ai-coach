@@ -93,11 +93,11 @@ const Dashboard = () => {
   };
 
   const handleStartModule = (moduleId) => {
-    navigate(`/modules/${moduleId}`);
+    navigate(`/module/${moduleId}`);
   };
 
   const handleContinueModule = (moduleId) => {
-    navigate(`/modules/${moduleId}`);
+    navigate(`/module/${moduleId}`);
   };
 
   const getLevelColor = (level) => {
