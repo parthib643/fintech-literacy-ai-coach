@@ -14,6 +14,7 @@ const seedModules = [
     description: "Basics of financial literacy",
     level: "Beginner",
     content: "This module introduces the basics of saving, budgeting, and spending."
+    
   },
   {
     title: "Investing 101",
