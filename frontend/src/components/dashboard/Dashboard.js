@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -9,6 +10,17 @@ import SendIcon from "@mui/icons-material/Send";
 import ModuleList from "../modules/ModuleList";
 import Progress from "./Progress";
 import Achievements from "./Achievements";
+=======
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import api from '../../api/api';
+import ModuleList from '../modules/ModuleList';
+import Progress from './Progress';
+import Achievements from './Achievements';
+import Chatbot from '../chatbot/Chatbot';
+
+>>>>>>> 052683b17a13223c8c36efcf732792deee9cc67d
 import {
   Container,
   Grid,
@@ -108,11 +120,11 @@ const Dashboard = () => {
   };
 
   const handleStartModule = (moduleId) => {
-    navigate(`/modules/${moduleId}`);
+    navigate(`/module/${moduleId}`);
   };
 
   const handleContinueModule = (moduleId) => {
-    navigate(`/modules/${moduleId}`);
+    navigate(`/module/${moduleId}`);
   };
 
   const sendAiMessage = () => {
@@ -536,6 +548,10 @@ const Dashboard = () => {
                     </Paper>
                   </Grid>
 
+                  {/* Available Modules */}
+                  <Grid item xs={12}>
+                    <Chatbot />
+                  </Grid>
                   {/* Available Modules */}
                   <Grid item xs={12}>
                     <Typography variant="h6" sx={{ mb: 2 }}>
