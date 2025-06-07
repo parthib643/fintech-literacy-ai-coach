@@ -117,7 +117,7 @@ const ModuleList = () => {
       return; // Do nothing for locked modules
     }
     
-    navigate(`/modules/${moduleId}`);
+    navigate(`/module/${moduleId}`);
   };
 
   if (loading) {
