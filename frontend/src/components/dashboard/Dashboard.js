@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -10,17 +9,8 @@ import SendIcon from "@mui/icons-material/Send";
 import ModuleList from "../modules/ModuleList";
 import Progress from "./Progress";
 import Achievements from "./Achievements";
-=======
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import api from '../../api/api';
-import ModuleList from '../modules/ModuleList';
-import Progress from './Progress';
-import Achievements from './Achievements';
-import Chatbot from '../chatbot/Chatbot';
+import Chatbot from "../chatbot/Chatbot";
 
->>>>>>> 052683b17a13223c8c36efcf732792deee9cc67d
 import {
   Container,
   Grid,
@@ -266,6 +256,112 @@ const Dashboard = () => {
       </List>
     </Box>
   );
+
+  // Daily financial literacy questions (can be moved to backend later)
+  const dailyQuestions = [
+    {
+      question:
+        "What is the difference between a savings account and a checking account?",
+      choices: [
+        "Savings accounts earn interest, checking accounts are for daily transactions.",
+        "Checking accounts earn more interest than savings accounts.",
+        "Savings accounts are only for businesses.",
+        "There is no difference.",
+      ],
+      correct: 0,
+    },
+    {
+      question: "Why is it important to have an emergency fund?",
+      choices: [
+        "To buy luxury items whenever you want.",
+        "To cover unexpected expenses without going into debt.",
+        "To invest in the stock market.",
+        "To pay regular monthly bills.",
+      ],
+      correct: 1,
+    },
+    {
+      question: "What does 'compound interest' mean?",
+      choices: [
+        "Interest calculated only on the initial amount.",
+        "Interest earned on both the initial amount and previously earned interest.",
+        "Interest that decreases over time.",
+        "Interest paid only at the end of the year.",
+      ],
+      correct: 1,
+    },
+    {
+      question: "How can budgeting help you manage your finances?",
+      choices: [
+        "By tracking income and expenses to control spending.",
+        "By increasing your salary automatically.",
+        "By eliminating all expenses.",
+        "By making you pay more taxes.",
+      ],
+      correct: 0,
+    },
+    {
+      question: "What is a credit score and why does it matter?",
+      choices: [
+        "A number showing your income level.",
+        "A number representing your creditworthiness, affecting loan approvals.",
+        "A score given to your bank account.",
+        "A score for your investment portfolio.",
+      ],
+      correct: 1,
+    },
+    {
+      question: "What are the risks and benefits of investing in stocks?",
+      choices: [
+        "Stocks are always safe and guarantee returns.",
+        "Stocks can offer high returns but also carry risk of loss.",
+        "Stocks never lose value.",
+        "Stocks are only for the wealthy.",
+      ],
+      correct: 1,
+    },
+    {
+      question: "What is the 50/30/20 rule in personal finance?",
+      choices: [
+        "50% savings, 30% rent, 20% fun.",
+        "50% needs, 30% wants, 20% savings.",
+        "50% investments, 30% shopping, 20% bills.",
+        "50% taxes, 30% food, 20% travel.",
+      ],
+      correct: 1,
+    },
+  ];
+
+  // Get today's question based on date
+  const getTodayQuestion = () => {
+    const today = new Date();
+    // Use UTC midnight to ensure question changes at 12:00 am
+    const startOfDay = new Date(
+      Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
+    );
+    // Calculate days since a fixed date (e.g., Jan 1, 2024)
+    const baseDate = new Date(Date.UTC(2024, 0, 1));
+    const diffDays = Math.floor(
+      (startOfDay - baseDate) / (1000 * 60 * 60 * 24)
+    );
+    const idx =
+      ((diffDays % dailyQuestions.length) + dailyQuestions.length) %
+      dailyQuestions.length;
+    return dailyQuestions[idx];
+  };
+
+  const [selectedChoice, setSelectedChoice] = useState(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+
+  const handleChoiceSelect = (idx) => {
+    setSelectedChoice(idx);
+    setShowFeedback(true);
+  };
+
+  useEffect(() => {
+    setSelectedChoice(null);
+    setShowFeedback(false);
+  }, [getTodayQuestion().question]);
 
   if (loading) {
     return (
@@ -545,6 +641,100 @@ const Dashboard = () => {
                           </Box>
                         </Grid>
                       </Grid>
+                    </Paper>
+                  </Grid>
+
+                  {/* Daily Task Section */}
+                  <Grid item xs={12}>
+                    <Paper sx={{ p: 3, mb: 3, background: "#f5f5fa" }}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 1 }}
+                      >
+                        <EmojiEventsIcon color="secondary" sx={{ mr: 1 }} />
+                        <Typography variant="h6">Daily Task</Typography>
+                      </Box>
+                      <Divider sx={{ mb: 2 }} />
+                      <Typography variant="subtitle1" sx={{ mb: 2 }}>
+                        {getTodayQuestion().question}
+                      </Typography>
+                      <Box>
+                        {getTodayQuestion().choices.map((choice, idx) => {
+                          let color = "primary";
+                          let customStyles = {};
+                          if (showFeedback) {
+                            if (selectedChoice === idx) {
+                              if (
+                                selectedChoice === getTodayQuestion().correct
+                              ) {
+                                color = "success";
+                                customStyles = {
+                                  backgroundColor: "#4caf50",
+                                  color: "#fff",
+                                  boxShadow: "0 0 0 4px #a5d6a7",
+                                  borderColor: "#388e3c",
+                                };
+                              } else {
+                                color = "error";
+                                customStyles = {
+                                  backgroundColor: "#f44336",
+                                  color: "#fff",
+                                  boxShadow: "0 0 0 4px #ef9a9a",
+                                  borderColor: "#b71c1c",
+                                };
+                              }
+                            }
+                          }
+                          return (
+                            <Button
+                              key={idx}
+                              variant={
+                                selectedChoice === idx
+                                  ? "contained"
+                                  : "outlined"
+                              }
+                              color={color}
+                              onClick={() => handleChoiceSelect(idx)}
+                              sx={{
+                                mb: 1,
+                                mr: 1,
+                                textAlign: "left",
+                                minWidth: 250,
+                                transition: "box-shadow 0.2s",
+                                ...customStyles,
+                              }}
+                              disabled={showFeedback}
+                            >
+                              {choice}
+                            </Button>
+                          );
+                        })}
+                      </Box>
+                      {showFeedback && (
+                        <Typography
+                          variant="body2"
+                          sx={{ mt: 2 }}
+                          color={
+                            selectedChoice === getTodayQuestion().correct
+                              ? "success.main"
+                              : "error.main"
+                          }
+                        >
+                          {selectedChoice === getTodayQuestion().correct
+                            ? "Correct! Well done."
+                            : `Incorrect. The correct answer is: "${
+                                getTodayQuestion().choices[
+                                  getTodayQuestion().correct
+                                ]
+                              }"`}
+                        </Typography>
+                      )}
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mt: 2 }}
+                      >
+                        Come back tomorrow for a new challenge!
+                      </Typography>
                     </Paper>
                   </Grid>
 
