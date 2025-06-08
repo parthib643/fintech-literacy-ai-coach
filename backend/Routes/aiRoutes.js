@@ -1,21 +1,22 @@
 const express = require("express");
 const router = express.Router();
+const axios = require("axios");
 
-// Example AI assistant route
 router.post("/chat", async (req, res) => {
-  const { prompt } = req.body;
+  try {
+    const response = await axios.post("http://localhost:5005/chat", {
+      message: req.body.message,
+    });
 
-  if (!prompt) {
-    return res.status(400).json({ error: "Prompt is required" });
+    res.json({ response: response.data.response });
+  } catch (error) {
+    console.error("Chatbot error:", error.message);
+    res.status(500).json({ error: "Chatbot service error" });
   }
-
-  // Dummy response for now
-  const aiResponse = `You said: ${prompt}`;
-
-  res.json({ response: aiResponse });
 });
 
 module.exports = router;
+
 
 /*
 run this part when openai api key is set

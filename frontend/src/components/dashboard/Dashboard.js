@@ -5,6 +5,8 @@ import api from '../../api/api';
 import ModuleList from '../modules/ModuleList';
 import Progress from './Progress';
 import Achievements from './Achievements';
+import Chatbot from '../chatbot/Chatbot';
+
 import {
   Container,
   Grid,
@@ -369,6 +371,10 @@ const Dashboard = () => {
                     </Paper>
                   </Grid>
 
+                  {/* Available Modules */}
+                  <Grid item xs={12}>
+                    <Chatbot />
+                  </Grid>
                   {/* Available Modules */}
                   <Grid item xs={12}>
                     <Typography variant="h6" sx={{ mb: 2 }}>
