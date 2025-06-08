@@ -7,6 +7,8 @@ const progressRoutes = require("./Routes/progressRoutes");
 const assessmentRoutes = require("./Routes/assesmentRoutes");
 const aiRoutes = require("./Routes/aiRoutes");
 const cors = require('cors');
+const submissionRoutes = require('./Routes/submissionRoutes');
+
 
 dotenv.config();
 connectDB();
@@ -34,6 +36,7 @@ app.use("/api/modules", moduleRoutes);
 app.use("/api/progress", progressRoutes);
 app.use("/api/assessment", assessmentRoutes);
 app.use("/api/ai", aiRoutes); 
+app.use('/submissions', submissionRoutes);
 
 
 

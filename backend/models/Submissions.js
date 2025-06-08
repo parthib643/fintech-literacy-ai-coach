@@ -1,15 +1,17 @@
-const mongoose = require("mongoose");
+// models/Submission.js
+const mongoose = require('mongoose');
 
 const submissionSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  module: { type: mongoose.Schema.Types.ObjectId, ref: "Module", required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  moduleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Module', required: true },
   answers: [
     {
-      questionId: mongoose.Schema.Types.ObjectId,
-      selectedAnswer: String
+      questionId: { type: mongoose.Schema.Types.ObjectId, required: true },
+      selectedAnswer: { type: String, required: true }
     }
   ],
+  score: { type: Number, required: true },
   submittedAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model("Submission", submissionSchema);
+module.exports = mongoose.model('Submission', submissionSchema);
