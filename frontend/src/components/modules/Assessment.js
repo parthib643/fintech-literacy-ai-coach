@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/api';
+
 import {
   Container,
   Paper,
@@ -15,22 +16,14 @@ import {
   FormControl,
   FormLabel,
   Alert,
-  Card,
-  CardContent,
-  LinearProgress,
-  Divider,
   Dialog,
-  DialogActions,
+  DialogTitle,
   DialogContent,
-  DialogContentText,
-  DialogTitle
+  DialogActions,
+  IconButton
 } from '@mui/material';
-import {
-  ArrowBack as ArrowBackIcon,
-  Check as CheckIcon,
-  Close as CloseIcon,
-  EmojiEvents as EmojiEventsIcon
-} from '@mui/icons-material';
+
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const Assessment = () => {
   const { moduleId } = useParams();
@@ -53,16 +46,11 @@ const Assessment = () => {
     const fetchAssessmentData = async () => {
       try {
         setLoading(true);
-        
-        // Fetch module details first
         const moduleResponse = await api.get(`/modules/${moduleId}`);
         setModule(moduleResponse.data);
-        
-        // Fetch assessment for this module
         const assessmentResponse = await api.get(`/assessment/${moduleId}`);
         setAssessment(assessmentResponse.data);
-        
-        // Initialize answers object
+
         if (assessmentResponse.data && assessmentResponse.data.questions) {
           const initialAnswers = {};
           assessmentResponse.data.questions.forEach((_, index) => {
@@ -103,11 +91,11 @@ const Assessment = () => {
   const calculateScore = () => {
     let correctAnswers = 0;
     assessment.questions.forEach((question, index) => {
-      if (answers[index] === question.correctAnswer) {
+      if (answers[index] === question.correctAnswer.toString()) {
         correctAnswers++;
       }
     });
-    
+
     return {
       correct: correctAnswers,
       total: assessment.questions.length,
@@ -116,36 +104,38 @@ const Assessment = () => {
   };
 
   const handleSubmit = async () => {
-    // Check if all questions are answered
     const unanswered = Object.values(answers).filter(answer => answer === null).length;
     if (unanswered > 0) {
       setError(`Please answer all questions. ${unanswered} question(s) remaining.`);
       return;
     }
-    
+
     setSubmitted(true);
     const calculatedScore = calculateScore();
     setScore(calculatedScore);
     setShowResults(true);
-    
+
     try {
-      // Submit assessment results
+      // Format answers with questionId and selectedAnswer
+      const formattedAnswers = assessment.questions.map((question, index) => ({
+        questionId: question._id,
+        selectedAnswer: answers[index]
+      }));
+
       const submissionData = {
         userId: user._id,
         moduleId,
-        answers: Object.values(answers),
+        answers: formattedAnswers,
         score: calculatedScore.percentage
       };
-      
+
       const response = await api.post('/submissions/create', submissionData);
-      
-      // Check if user earned an achievement
+
       if (response.data.achievement) {
         setAchievement(response.data.achievement);
         setAchievementDialog(true);
       }
-      
-      // Update module progress to completed
+
       await api.post('/progress/update', {
         userId: user._id,
         moduleId,
@@ -162,13 +152,10 @@ const Assessment = () => {
   };
 
   const handleRetakeAssessment = () => {
-    // Reset assessment state
     setCurrentQuestion(0);
     setSubmitted(false);
     setScore(null);
     setShowResults(false);
-    
-    // Reset answers
     const initialAnswers = {};
     assessment.questions.forEach((_, index) => {
       initialAnswers[index] = null;
@@ -206,214 +193,89 @@ const Assessment = () => {
     );
   }
 
-  // Results view
-  if (showResults) {
-    return (
-      <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-        
-        <Paper sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h4" gutterBottom>Assessment Results</Typography>
-          <Typography variant="h6" gutterBottom>{module.title}</Typography>
-          
-          <Box sx={{ my: 4, textAlign: 'center' }}>
-            <Typography variant="h3" color={score.percentage >= 70 ? 'success.main' : 'error.main'}>
-              {score.percentage}%
-            </Typography>
-            <Typography variant="body1">
-              You answered {score.correct} out of {score.total} questions correctly.
-            </Typography>
-            
-            <LinearProgress 
-              variant="determinate" 
-              value={score.percentage} 
-              color={score.percentage >= 70 ? 'success' : 'error'}
-              sx={{ mt: 2, mb: 2, height: 10, borderRadius: 5 }}
-            />
-            
-            {score.percentage >= 70 ? (
-              <Alert severity="success" sx={{ mt: 2 }}>
-                Congratulations! You have passed this assessment.
-              </Alert>
-            ) : (
-              <Alert severity="warning" sx={{ mt: 2 }}>
-                You need at least 70% to pass this assessment. Please review the module content and try again.
-              </Alert>
-            )}
-          </Box>
-          
-          <Divider sx={{ my: 3 }} />
-          
-          <Typography variant="h6" gutterBottom>Question Review</Typography>
-          
-          {assessment.questions.map((question, index) => (
-            <Card key={index} variant="outlined" sx={{ mb: 2, bgcolor: answers[index] === question.correctAnswer ? 'success.50' : 'error.50' }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  {answers[index] === question.correctAnswer ? (
-                    <CheckIcon color="success" sx={{ mr: 1 }} />
-                  ) : (
-                    <CloseIcon color="error" sx={{ mr: 1 }} />
-                  )}
-                  <Typography variant="body1">
-                    <strong>Question {index + 1}:</strong> {question.questionText}
-                  </Typography>
-                </Box>
-                
-                <Box sx={{ ml: 4, mt: 1 }}>
-                  <Typography variant="body2">
-                    <strong>Your answer:</strong> {question.options[answers[index]]}
-                  </Typography>
-                  {answers[index] !== question.correctAnswer && (
-                    <Typography variant="body2" color="success.main">
-                      <strong>Correct answer:</strong> {question.options[question.correctAnswer]}
-                    </Typography>
-                  )}
-                </Box>
-              </CardContent>
-            </Card>
-          ))}
-          
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
-            <Button 
-              variant="outlined" 
-              startIcon={<ArrowBackIcon />} 
-              onClick={handleBackToDashboard}
-            >
-              Back to Dashboard
-            </Button>
-            
-            {score.percentage < 70 && (
-              <Button 
-                variant="contained" 
-                color="primary" 
-                onClick={handleRetakeAssessment}
-              >
-                Retake Assessment
-              </Button>
-            )}
-          </Box>
-        </Paper>
-      </Container>
-    );
-  }
-
-  // Assessment taking view
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-      
-      <Paper sx={{ p: 3, mb: 3 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h4">Assessment</Typography>
-          <Typography variant="h6">{module.title}</Typography>
-        </Box>
-        
-        <LinearProgress 
-          variant="determinate" 
-          value={(currentQuestion + 1) / assessment.questions.length * 100} 
-          sx={{ mb: 3, height: 8, borderRadius: 5 }}
-        />
-        
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          Question {currentQuestion + 1} of {assessment.questions.length}
+      <Paper elevation={3} sx={{ p: 3 }}>
+        <Typography variant="h5" gutterBottom>
+          {module.title} - Assessment
         </Typography>
-        
-        {/* Current Question */}
-        <Card variant="outlined" sx={{ mb: 3 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              {assessment.questions[currentQuestion].questionText}
-            </Typography>
-            
-            <FormControl component="fieldset" sx={{ mt: 2, width: '100%' }}>
-              <FormLabel component="legend">Select your answer:</FormLabel>
+
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        {!showResults ? (
+          <>
+            <FormControl component="fieldset">
+              <FormLabel component="legend">
+                Question {currentQuestion + 1} of {assessment.questions.length}
+              </FormLabel>
+              <Typography variant="subtitle1" sx={{ mt: 1 }}>
+                {assessment.questions[currentQuestion].questionText}
+              </Typography>
               <RadioGroup
                 name={`question-${currentQuestion}`}
                 value={answers[currentQuestion] || ''}
                 onChange={handleAnswerChange}
               >
-                {assessment.questions[currentQuestion].options.map((option, index) => (
-                  <FormControlLabel 
-                    key={index} 
-                    value={index.toString()} 
-                    control={<Radio />} 
-                    label={option} 
-                    sx={{ mt: 1 }}
+                {assessment.questions[currentQuestion].options.map((option, idx) => (
+                  <FormControlLabel
+                    key={idx}
+                    value={option}
+                    control={<Radio />}
+                    label={option}
                   />
                 ))}
               </RadioGroup>
             </FormControl>
-          </CardContent>
-        </Card>
-        
-        {/* Navigation Buttons */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Button
-            variant="outlined"
-            startIcon={<ArrowBackIcon />}
-            onClick={handlePrevious}
-            disabled={currentQuestion === 0}
-          >
-            Previous
-          </Button>
-          
-          {currentQuestion < assessment.questions.length - 1 ? (
-            <Button
-              variant="contained"
-              onClick={handleNext}
-              disabled={answers[currentQuestion] === null}
-            >
-              Next
-            </Button>
-          ) : (
-            <Button
-              variant="contained"
-              color="success"
-              onClick={handleSubmit}
-              disabled={Object.values(answers).some(answer => answer === null)}
-            >
-              Submit Assessment
-            </Button>
-          )}
-        </Box>
-      </Paper>
-      
-      <Button 
-        variant="outlined" 
-        startIcon={<ArrowBackIcon />} 
-        onClick={handleBackToDashboard}
-      >
-        Back to Dashboard
-      </Button>
-      
-      {/* Achievement Dialog */}
-      <Dialog
-        open={achievementDialog}
-        onClose={handleCloseAchievementDialog}
-        aria-labelledby="achievement-dialog-title"
-      >
-        <DialogTitle id="achievement-dialog-title">
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <EmojiEventsIcon sx={{ color: 'gold', mr: 1, fontSize: 30 }} />
-            Achievement Unlocked!
-          </Box>
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Congratulations! You've earned a new achievement:
-          </DialogContentText>
-          {achievement && (
-            <Box sx={{ textAlign: 'center', my: 2 }}>
-              <Typography variant="h5" color="primary">{achievement.title}</Typography>
-              <Typography variant="body1">{achievement.description}</Typography>
+
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+              <Button variant="outlined" onClick={handlePrevious} disabled={currentQuestion === 0}>
+                Previous
+              </Button>
+              {currentQuestion < assessment.questions.length - 1 ? (
+                <Button variant="contained" onClick={handleNext}>
+                  Next
+                </Button>
+              ) : (
+                <Button variant="contained" color="success" onClick={handleSubmit}>
+                  Submit
+                </Button>
+              )}
             </Box>
-          )}
+          </>
+        ) : (
+          <>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Results
+            </Typography>
+            <Typography>
+              Score: {score.correct} out of {score.total} (
+              {score.percentage}%)
+            </Typography>
+            <Box sx={{ mt: 3 }}>
+              <Button variant="outlined" onClick={handleRetakeAssessment} sx={{ mr: 2 }}>
+                Retake
+              </Button>
+              <Button variant="contained" onClick={handleBackToDashboard}>
+                Back to Dashboard
+              </Button>
+            </Box>
+          </>
+        )}
+      </Paper>
+
+      <Dialog open={achievementDialog} onClose={handleCloseAchievementDialog}>
+        <DialogTitle>🎉 New Achievement!</DialogTitle>
+        <DialogContent>
+          <Typography>
+            You've unlocked: <strong>{achievement?.name}</strong>
+          </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseAchievementDialog} color="primary" autoFocus>
-            Awesome!
-          </Button>
+          <Button onClick={handleCloseAchievementDialog}>Close</Button>
         </DialogActions>
       </Dialog>
     </Container>
