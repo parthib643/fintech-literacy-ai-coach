@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/api';
-
 import {
   Container,
   Paper,
@@ -16,20 +15,28 @@ import {
   FormControl,
   FormLabel,
   Alert,
+  Card,
+  CardContent,
+  LinearProgress,
+  Divider,
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
-  IconButton
+  DialogContent,
+  DialogContentText,
+  DialogTitle
 } from '@mui/material';
-
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import {
+  ArrowBack as ArrowBackIcon,
+  Check as CheckIcon,
+  Close as CloseIcon,
+  EmojiEvents as EmojiEventsIcon
+} from '@mui/icons-material';
 
 const Assessment = () => {
   const { moduleId } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
-  
+
   const [assessment, setAssessment] = useState(null);
   const [module, setModule] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -48,10 +55,11 @@ const Assessment = () => {
         setLoading(true);
         const moduleResponse = await api.get(`/modules/${moduleId}`);
         setModule(moduleResponse.data);
+
         const assessmentResponse = await api.get(`/assessment/${moduleId}`);
         setAssessment(assessmentResponse.data);
 
-        if (assessmentResponse.data && assessmentResponse.data.questions) {
+        if (assessmentResponse.data?.questions) {
           const initialAnswers = {};
           assessmentResponse.data.questions.forEach((_, index) => {
             initialAnswers[index] = null;
@@ -59,7 +67,6 @@ const Assessment = () => {
           setAnswers(initialAnswers);
         }
       } catch (err) {
-        console.error('Error fetching assessment data:', err);
         setError('Failed to load assessment. Please try again.');
       } finally {
         setLoading(false);
@@ -91,7 +98,7 @@ const Assessment = () => {
   const calculateScore = () => {
     let correctAnswers = 0;
     assessment.questions.forEach((question, index) => {
-      if (answers[index] === question.correctAnswer.toString()) {
+      if (String(answers[index]) === String(question.correctAnswer)) {
         correctAnswers++;
       }
     });
@@ -116,20 +123,17 @@ const Assessment = () => {
     setShowResults(true);
 
     try {
-      // Format answers with questionId and selectedAnswer
-      const formattedAnswers = assessment.questions.map((question, index) => ({
-        questionId: question._id,
-        selectedAnswer: answers[index]
-      }));
-
       const submissionData = {
         userId: user._id,
         moduleId,
-        answers: formattedAnswers,
+        answers: assessment.questions.map((q, index) => ({
+          questionId: q._id,
+          selectedAnswer: answers[index]?.toString()
+        })),
         score: calculatedScore.percentage
       };
 
-      const response = await api.post('/submissions/create', submissionData);
+     const response = await api.post('/submit', submissionData);
 
       if (response.data.achievement) {
         setAchievement(response.data.achievement);
@@ -142,8 +146,7 @@ const Assessment = () => {
         status: 'completed'
       });
     } catch (err) {
-      console.error('Error submitting assessment:', err);
-      setError('Failed to submit assessment. Your answers are saved locally.');
+      setError(`Failed to submit assessment: ${err?.response?.data?.message || err.message || 'Unknown error'}`);
     }
   };
 
@@ -178,104 +181,175 @@ const Assessment = () => {
   if (!assessment || !module) {
     return (
       <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-        <Alert severity="error">
-          Assessment not found. Please return to the dashboard and try again.
-        </Alert>
-        <Button 
-          variant="contained" 
-          startIcon={<ArrowBackIcon />} 
-          onClick={handleBackToDashboard}
-          sx={{ mt: 2 }}
-        >
+        <Alert severity="error">Assessment not found. Please return to the dashboard and try again.</Alert>
+        <Button variant="contained" startIcon={<ArrowBackIcon />} onClick={handleBackToDashboard} sx={{ mt: 2 }}>
           Back to Dashboard
         </Button>
       </Container>
     );
   }
 
+  if (showResults) {
+    return (
+      <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        <Paper sx={{ p: 3, mb: 3 }}>
+          <Typography variant="h4" gutterBottom>Assessment Results</Typography>
+          <Typography variant="h6" gutterBottom>{module.title}</Typography>
+          <Box sx={{ my: 4, textAlign: 'center' }}>
+            <Typography variant="h3" color={score.percentage >= 70 ? 'success.main' : 'error.main'}>
+              {score.percentage}%
+            </Typography>
+            <Typography>You answered {score.correct} out of {score.total} questions correctly.</Typography>
+            <LinearProgress
+              variant="determinate"
+              value={score.percentage}
+              color={score.percentage >= 70 ? 'success' : 'error'}
+              sx={{ mt: 2, mb: 2, height: 10, borderRadius: 5 }}
+            />
+            {score.percentage >= 70 ? (
+              <Alert severity="success" sx={{ mt: 2 }}>Congratulations! You have passed this assessment.</Alert>
+            ) : (
+              <Alert severity="warning" sx={{ mt: 2 }}>
+                You need at least 70% to pass. Please review and try again.
+              </Alert>
+            )}
+          </Box>
+          <Divider sx={{ my: 3 }} />
+          <Typography variant="h6" gutterBottom>Question Review</Typography>
+          {assessment.questions.map((question, index) => {
+            const selected = String(answers[index]);
+            const correct = String(question.correctAnswer);
+            const isCorrect = selected === correct;
+
+            return (
+              <Card
+                key={index}
+                variant="outlined"
+                sx={{ mb: 2, bgcolor: isCorrect ? 'success.50' : 'error.50' }}
+              >
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    {isCorrect ? (
+                      <CheckIcon color="success" sx={{ mr: 1 }} />
+                    ) : (
+                      <CloseIcon color="error" sx={{ mr: 1 }} />
+                    )}
+                    <Typography variant="body1">
+                      <strong>Question {index + 1}:</strong> {question.questionText}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ ml: 4, mt: 1 }}>
+                    <Typography variant="body2">
+                      <strong>Your answer:</strong> {question.options[parseInt(selected)] ?? 'Not answered'}
+                    </Typography>
+                    
+                      <Typography variant="body2" >
+                        <strong >Correct answer:</strong> {' '}
+  {Number.isInteger(Number(question.correctAnswer)) && question.options[Number(question.correctAnswer)] !== undefined
+    ? question.options[Number(question.correctAnswer)]
+    : 'Invalid correctAnswer index'}
+                      </Typography>
+                    
+                  </Box>
+                </CardContent>
+              </Card>
+            );
+          })}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+            <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={handleBackToDashboard}>
+              Back to Dashboard
+            </Button>
+            {score.percentage < 70 && (
+              <Button variant="contained" onClick={handleRetakeAssessment}>
+                Retake Assessment
+              </Button>
+            )}
+          </Box>
+        </Paper>
+      </Container>
+    );
+  }
+
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-      <Paper elevation={3} sx={{ p: 3 }}>
-        <Typography variant="h5" gutterBottom>
-          {module.title} - Assessment
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      <Paper sx={{ p: 3, mb: 3 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+          <Typography variant="h4">Assessment</Typography>
+          <Typography variant="h6">{module.title}</Typography>
+        </Box>
+        <LinearProgress
+          variant="determinate"
+          value={((currentQuestion + 1) / assessment.questions.length) * 100}
+          sx={{ mb: 3, height: 8, borderRadius: 5 }}
+        />
+        <Typography variant="body2" sx={{ mb: 3 }}>
+          Question {currentQuestion + 1} of {assessment.questions.length}
         </Typography>
-
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-
-        {!showResults ? (
-          <>
-            <FormControl component="fieldset">
-              <FormLabel component="legend">
-                Question {currentQuestion + 1} of {assessment.questions.length}
-              </FormLabel>
-              <Typography variant="subtitle1" sx={{ mt: 1 }}>
-                {assessment.questions[currentQuestion].questionText}
-              </Typography>
+        <Card variant="outlined" sx={{ mb: 3 }}>
+          <CardContent>
+            <Typography variant="h6">{assessment.questions[currentQuestion].questionText}</Typography>
+            <FormControl component="fieldset" sx={{ mt: 2 }}>
+              <FormLabel>Select your answer:</FormLabel>
               <RadioGroup
                 name={`question-${currentQuestion}`}
-                value={answers[currentQuestion] || ''}
+                value={answers[currentQuestion]?.toString() || ''}
                 onChange={handleAnswerChange}
               >
-                {assessment.questions[currentQuestion].options.map((option, idx) => (
+                {assessment.questions[currentQuestion].options.map((option, index) => (
                   <FormControlLabel
-                    key={idx}
-                    value={option}
+                    key={index}
+                    value={index.toString()}
                     control={<Radio />}
                     label={option}
+                    sx={{ mt: 1 }}
                   />
                 ))}
               </RadioGroup>
             </FormControl>
-
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
-              <Button variant="outlined" onClick={handlePrevious} disabled={currentQuestion === 0}>
-                Previous
-              </Button>
-              {currentQuestion < assessment.questions.length - 1 ? (
-                <Button variant="contained" onClick={handleNext}>
-                  Next
-                </Button>
-              ) : (
-                <Button variant="contained" color="success" onClick={handleSubmit}>
-                  Submit
-                </Button>
-              )}
-            </Box>
-          </>
-        ) : (
-          <>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Results
-            </Typography>
-            <Typography>
-              Score: {score.correct} out of {score.total} (
-              {score.percentage}%)
-            </Typography>
-            <Box sx={{ mt: 3 }}>
-              <Button variant="outlined" onClick={handleRetakeAssessment} sx={{ mr: 2 }}>
-                Retake
-              </Button>
-              <Button variant="contained" onClick={handleBackToDashboard}>
-                Back to Dashboard
-              </Button>
-            </Box>
-          </>
-        )}
+          </CardContent>
+        </Card>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Button variant="outlined" onClick={handlePrevious} disabled={currentQuestion === 0}>
+            Previous
+          </Button>
+          {currentQuestion < assessment.questions.length - 1 ? (
+            <Button variant="contained" onClick={handleNext} disabled={answers[currentQuestion] === null}>
+              Next
+            </Button>
+          ) : (
+            <Button variant="contained" color="success" onClick={handleSubmit} disabled={Object.values(answers).some(a => a === null)}>
+              Submit Assessment
+            </Button>
+          )}
+        </Box>
       </Paper>
 
+      <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={handleBackToDashboard}>
+        Back to Dashboard
+      </Button>
+
       <Dialog open={achievementDialog} onClose={handleCloseAchievementDialog}>
-        <DialogTitle>🎉 New Achievement!</DialogTitle>
+        <DialogTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <EmojiEventsIcon sx={{ color: 'gold', mr: 1, fontSize: 30 }} />
+            Achievement Unlocked!
+          </Box>
+        </DialogTitle>
         <DialogContent>
-          <Typography>
-            You've unlocked: <strong>{achievement?.name}</strong>
-          </Typography>
+          <DialogContentText>Congratulations! You've earned a new achievement:</DialogContentText>
+          {achievement && (
+            <Box sx={{ textAlign: 'center', my: 2 }}>
+              <Typography variant="h5" color="primary">{achievement.title}</Typography>
+              <Typography variant="body1">{achievement.description}</Typography>
+            </Box>
+          )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseAchievementDialog}>Close</Button>
+          <Button onClick={handleCloseAchievementDialog} color="primary" autoFocus>
+            Awesome!
+          </Button>
         </DialogActions>
       </Dialog>
     </Container>
