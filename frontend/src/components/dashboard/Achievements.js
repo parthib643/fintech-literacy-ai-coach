@@ -92,7 +92,7 @@ const Achievements = () => {
 
   // Mark achievements as unlocked based on user's achievements
   const displayAchievements = allAchievements.map(achievement => {
-    const userAchievement = achievements.find(a => a.title === achievement.title);
+    const userAchievement = achievements?.achievements?.find(a => a.title === achievement.title);
     return {
       ...achievement,
       unlocked: !!userAchievement,

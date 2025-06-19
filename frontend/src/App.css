@@ -173,8 +173,313 @@ input, .MuiInputBase-root {
 
 .App {
   text-align: center;
+  min-height: 100vh;
+  background: linear-gradient(120deg, #e0e7ff 0%, #f0fdfa 100%);
+  animation: bgFade 8s ease-in-out infinite alternate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
 }
 
+@keyframes bgFade {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+  filter: drop-shadow(0 0 16px #6366f1) drop-shadow(0 0 32px #06b6d4);
+  animation: App-logo-spin infinite 20s linear,
+    logoPop 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes logoPop {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear,
+      logoPop 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  box-shadow: 0 8px 32px 0 rgba(99, 102, 241, 0.08),
+    0 1.5px 6px 0 rgba(6, 182, 212, 0.08);
+  border-radius: 24px;
+  margin: 24px auto;
+  width: 90vw;
+  max-width: 1200px;
+  animation: fadeIn 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.App-link {
+  color: #61dafb;
+  font-weight: 700;
+  text-decoration: none;
+  position: relative;
+  transition: color 0.3s;
+}
+.App-link:after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #6366f1 0%, #06b6d4 100%);
+  transition: width 0.3s;
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+}
+.App-link:hover {
+  color: #6366f1;
+}
+.App-link:hover:after {
+  width: 100%;
+}
+
+/* Glassy Card Animation */
+.App-card {
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 8px 32px 0 rgba(99, 102, 241, 0.08),
+    0 1.5px 6px 0 rgba(6, 182, 212, 0.08);
+  border-radius: 18px;
+  padding: 2rem 2.5rem;
+  margin: 2rem auto;
+  max-width: 600px;
+  animation: cardFadeIn 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+@keyframes cardFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Animated Gradient Button */
+.animated-gradient-btn {
+  background: linear-gradient(90deg, #6366f1 0%, #06b6d4 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 28px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 8px 0 rgba(99, 102, 241, 0.18);
+  transition: background 0.4s, transform 0.2s;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  animation: glowPulse 1.5s infinite alternate;
+}
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 0 0 #6366f1;
+  }
+  100% {
+    box-shadow: 0 0 16px 4px #6366f1;
+  }
+}
+.animated-gradient-btn:hover {
+  background: linear-gradient(90deg, #06b6d4 0%, #6366f1 100%);
+  transform: translateY(-2px) scale(1.04);
+}
+
+/* Floating Animation for Avatars */
+.floating-avatar {
+  animation: floatAvatar 2.5s ease-in-out infinite alternate;
+}
+@keyframes floatAvatar {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  background: #e0e7ff;
+}
+::-webkit-scrollbar-thumb {
+  background: #a5b4fc;
+  border-radius: 8px;
+}
+
+/* Responsive Typography */
+h1,
+.MuiTypography-h1 {
+  font-size: 2.8rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+h2,
+.MuiTypography-h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+h3,
+.MuiTypography-h3 {
+  font-size: 1.7rem;
+  font-weight: 600;
+}
+h4,
+.MuiTypography-h4 {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  h1,
+  .MuiTypography-h1 {
+    font-size: 2rem;
+  }
+  h2,
+  .MuiTypography-h2 {
+    font-size: 1.5rem;
+  }
+  h3,
+  .MuiTypography-h3 {
+    font-size: 1.2rem;
+  }
+}
+
+/* Subtle fade-in for all containers */
+.fade-in {
+  animation: fadeIn 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Navbar styling */
+.MuiAppBar-root {
+  background: linear-gradient(135deg, #2e2677 0%, #4a3f9f 100%) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+.MuiToolbar-root {
+  padding: 0.5rem 1rem !important;
+}
+
+/* Icon button animations and styling */
+.MuiIconButton-root {
+  transition: all 0.3s ease !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.MuiIconButton-root:hover {
+  transform: translateY(-2px) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.MuiIconButton-root::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translate(-50%, -50%) scale(0);
+  border-radius: 50%;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.MuiIconButton-root:active::after {
+  transform: translate(-50%, -50%) scale(1.5);
+  opacity: 1;
+}
+
+/* Avatar styling */
+.MuiAvatar-root {
+  border: 2px solid rgba(255, 255, 255, 0.2) !important;
+  transition: all 0.3s ease !important;
+}
+
+.MuiAvatar-root:hover {
+  transform: scale(1.05) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Toolbar title */
+.MuiTypography-root.MuiTypography-h6 {
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+  background: linear-gradient(
+    120deg,
+    #fff,
+    rgba(255, 255, 255, 0.8)
+  ) !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-size: 1.5rem !important;
+}
+
+/* Menu styling */
+.MuiMenu-paper {
+  border-radius: 12px !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) !important;
+  animation: menuFade 0.2s ease !important;
+}
+
+@keyframes menuFade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.MuiMenuItem-root {
+  transition: all 0.2s ease !important;
+  padding: 0.75rem 1.5rem !important;
+}
+
+.MuiMenuItem-root:hover {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Rest of the existing styles */
 .App-logo {
   height: 40vmin;
   pointer-events: none;

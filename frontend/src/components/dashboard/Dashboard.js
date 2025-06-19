@@ -6,7 +6,6 @@ import api from '../../api/api';
 import ModuleList from '../modules/ModuleList';
 import Progress from './Progress';
 import Achievements from './Achievements';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import LockIcon from '@mui/icons-material/Lock';
 import SendIcon from '@mui/icons-material/Send';
 
@@ -35,8 +34,12 @@ import {
   Avatar,
   Tab,
   Tabs,
-  TextField
-} from '@mui/material';
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 import {
   School as SchoolIcon,
   Timeline as TimelineIcon,
@@ -47,10 +50,99 @@ import {
   TrendingUp as TrendingUpIcon,
   Logout as LogoutIcon,
   Settings as SettingsIcon,
-  Person as PersonIcon, // Add this import
-} from '@mui/icons-material';
+  Person as PersonIcon,
+} from "@mui/icons-material";
 
-// Muted deep blue background, perfect for white text
+// Daily financial literacy questions (can be moved to backend later)
+const dailyQuestions = [
+  {
+    question: "What is the difference between a savings account and a checking account?",
+    choices: [
+      "Savings accounts earn interest, checking accounts are for daily transactions.",
+      "Checking accounts earn more interest than savings accounts.",
+      "Savings accounts are only for businesses.",
+      "There is no difference.",
+    ],
+    correct: 0,
+  },
+  {
+    question: "Why is it important to have an emergency fund?",
+    choices: [
+      "To buy luxury items whenever you want.",
+      "To cover unexpected expenses without going into debt.",
+      "To invest in the stock market.",
+      "To pay regular monthly bills.",
+    ],
+    correct: 1,
+  },
+  {
+    question: "What does 'compound interest' mean?",
+    choices: [
+      "Interest calculated only on the initial amount.",
+      "Interest earned on both the initial amount and previously earned interest.",
+      "Interest that decreases over time.",
+      "Interest paid only at the end of the year.",
+    ],
+    correct: 1,
+  },
+  {
+    question: "How can budgeting help you manage your finances?",
+    choices: [
+      "By tracking income and expenses to control spending.",
+      "By increasing your salary automatically.",
+      "By eliminating all expenses.",
+      "By making you pay more taxes.",
+    ],
+    correct: 0,
+  },
+  {
+    question: "What is a credit score and why does it matter?",
+    choices: [
+      "A number showing your income level.",
+      "A number representing your creditworthiness, affecting loan approvals.",
+      "A score given to your bank account.",
+      "A score for your investment portfolio.",
+    ],
+    correct: 1,
+  },
+  {
+    question: "What are the risks and benefits of investing in stocks?",
+    choices: [
+      "Stocks are always safe and guarantee returns.",
+      "Stocks can offer high returns but also carry risk of loss.",
+      "Stocks never lose value.",
+      "Stocks are only for the wealthy.",
+    ],
+    correct: 1,
+  },
+  {
+    question: "What is the 50/30/20 rule in personal finance?",
+    choices: [
+      "50% savings, 30% rent, 20% fun.",
+      "50% needs, 30% wants, 20% savings.",
+      "50% investments, 30% shopping, 20% bills.",
+      "50% taxes, 30% food, 20% travel.",
+    ],
+    correct: 1,
+  },
+];
+
+// Get today's question based on date
+const getTodayQuestion = () => {
+  const today = new Date();
+  // Use UTC midnight to ensure question changes at 12:00 am
+  const startOfDay = new Date(
+    Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
+  );
+  // Calculate days since a fixed date (e.g., Jan 1, 2024)
+  const baseDate = new Date(Date.UTC(2024, 0, 1));
+  const diffDays = Math.floor((startOfDay - baseDate) / (1000 * 60 * 60 * 24));
+  const idx =
+    ((diffDays % dailyQuestions.length) + dailyQuestions.length) %
+    dailyQuestions.length;
+  return dailyQuestions[idx];
+};
+
 const staticDashboardBg = {
   minHeight: '100vh',
   width: '100vw',
@@ -65,7 +157,6 @@ const staticDashboardBg = {
   zIndex: -1,
 };
 
-// Helper function to sort modules by level order
 const levelOrder = { Beginner: 1, Intermediate: 2, Advanced: 3 };
 const sortModulesByLevel = (modules) => {
   return [...modules].sort((a, b) => {
@@ -75,7 +166,6 @@ const sortModulesByLevel = (modules) => {
   });
 };
 
-// Make sure AIIcon is defined above your component:
 const AIIcon = (props) => (
   <svg
     width={props.fontSize === "medium" ? 36 : 28}
@@ -131,16 +221,33 @@ const Dashboard = () => {
   const [progress, setProgress] = useState([]);
   const [path, setPath] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  // Add state for chatbot drawer
+
+  // Chatbot drawer state
   const [chatbotDrawerOpen, setChatbotDrawerOpen] = useState(false);
   const [chatbotDrawerWidth, setChatbotDrawerWidth] = useState(420);
-  const resizingRef = useRef(true);
+  const resizingRef = useRef(false);
   const chatEndRef = useRef(null);
+
   // Chatbot logic from Chatbot.js
   const { messages: chatMessages, input: chatInput, setInput: setChatInput, handleSend } = useChatbot();
+
+  const [openDailyTask, setOpenDailyTask] = useState(true);
+  const [selectedChoice, setSelectedChoice] = useState(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+
+  // Check if daily task should be shown
+  useEffect(() => {
+    const lastShownDate = localStorage.getItem('lastDailyTaskDate');
+    const today = new Date().toDateString();
+    
+    if (lastShownDate !== today) {
+      setOpenDailyTask(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (!user || !user._id) return;
@@ -150,10 +257,10 @@ const Dashboard = () => {
       setError(null);
 
       try {
-        const modulesResponse = await api.get('/modules');
+        const modulesResponse = await api.get("/modules");
         setModules(modulesResponse.data);
       } catch (err) {
-        setError('Failed to load modules.');
+        setError("Failed to load modules.");
       }
 
       try {
@@ -176,6 +283,11 @@ const Dashboard = () => {
     fetchData();
   }, [user]);
 
+  const getModuleStatus = (moduleId) => {
+    const moduleProgress = progress.find((p) => p.module._id === moduleId);
+    return moduleProgress ? moduleProgress.status : "not started";
+  };
+
   const handleStartModule = (moduleId) => {
     navigate(`/module/${moduleId}`);
   };
@@ -186,14 +298,14 @@ const Dashboard = () => {
 
   const getLevelColor = (level) => {
     switch (level) {
-      case 'Beginner':
-        return 'success';
-      case 'Intermediate':
-        return 'primary';
-      case 'Advanced':
-        return 'error';
+      case "Beginner":
+        return "success";
+      case "Intermediate":
+        return "primary";
+      case "Advanced":
+        return "error";
       default:
-        return 'default';
+        return "default";
     }
   };
 
@@ -203,18 +315,37 @@ const Dashboard = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
 
-  const handleChatbotDrawerToggle = () => {
-    setChatbotDrawerOpen(!chatbotDrawerOpen);
+  const handleSkipTask = () => {
+    setOpenDailyTask(false);
+    setSelectedChoice(null);
+    setShowFeedback(false);
+    // Store today's date in localStorage
+    localStorage.setItem('lastDailyTaskDate', new Date().toDateString());
   };
 
-  // Drawer resizing logic (mouse and touch)
+  const handleChoiceSelect = (idx) => {
+    setSelectedChoice(idx);
+    setShowFeedback(true);
+  };
+
+  const handleCloseDailyTask = () => {
+    setOpenDailyTask(false);
+    localStorage.setItem('lastDailyTaskDate', new Date().toDateString());
+  };
+
+  useEffect(() => {
+    setSelectedChoice(null);
+    setShowFeedback(false);
+  }, [getTodayQuestion().question]);
+
+  // Drawer resizing logic (mouse only)
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!resizingRef.current) return;
@@ -228,19 +359,19 @@ const Dashboard = () => {
 
     const handleMouseUp = () => {
       resizingRef.current = false;
-      document.body.style.cursor = '';
+      document.body.style.cursor = "";
     };
 
     if (resizingRef.current) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = 'col-resize';
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+      document.body.style.cursor = "col-resize";
     }
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = '';
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+      document.body.style.cursor = "";
     };
   }, [chatbotDrawerOpen]);
 
@@ -251,6 +382,7 @@ const Dashboard = () => {
     }
   }, [chatMessages]);
 
+  // Chatbot drawer component
   const drawer = (
     <Box
       sx={{
@@ -446,10 +578,120 @@ const Dashboard = () => {
     );
   }
 
+  // Daily task dialog component
+  const dailyTaskDialog = (
+    <Dialog
+      open={openDailyTask}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 2,
+          p: 1,
+          background: "linear-gradient(to bottom, #ffffff, #f5f5fa)",
+        },
+      }}
+    >
+      <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <EmojiEventsIcon color="secondary" />
+        Daily Financial Challenge
+      </DialogTitle>
+      <DialogContent>
+        <Typography variant="subtitle1" sx={{ mb: 3 }}>
+          {getTodayQuestion().question}
+        </Typography>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+          {getTodayQuestion().choices.map((choice, idx) => {
+            let color = "primary";
+            let customStyles = {};
+            if (showFeedback) {
+              if (selectedChoice === idx) {
+                if (selectedChoice === getTodayQuestion().correct) {
+                  color = "success";
+                  customStyles = {
+                    backgroundColor: "#4caf50",
+                    color: "#fff",
+                    boxShadow: "0 0 0 4px #a5d6a7",
+                    borderColor: "#388e3c",
+                  };
+                } else {
+                  color = "error";
+                  customStyles = {
+                    backgroundColor: "#f44336",
+                    color: "#fff",
+                    boxShadow: "0 0 0 4px #ef9a9a",
+                    borderColor: "#b71c1c",
+                  };
+                }
+              }
+            }
+            return (
+              <Button
+                key={idx}
+                variant={selectedChoice === idx ? "contained" : "outlined"}
+                color={color}
+                onClick={() => handleChoiceSelect(idx)}
+                sx={{
+                  py: 1,
+                  textAlign: "left",
+                  transition: "box-shadow 0.2s",
+                  ...customStyles,
+                }}
+                disabled={showFeedback}
+              >
+                {choice}
+              </Button>
+            );
+          })}
+        </Box>
+        {showFeedback && (
+          <Typography
+            variant="body1"
+            sx={{ mt: 3, p: 2, borderRadius: 1 }}
+            color={
+              selectedChoice === getTodayQuestion().correct
+                ? "success.main"
+                : "error.main"
+            }
+            bgcolor={
+              selectedChoice === getTodayQuestion().correct
+                ? "success.light"
+                : "error.light"
+            }
+          >
+            {selectedChoice === getTodayQuestion().correct
+              ? "🎉 Correct! Well done."
+              : `❌ Incorrect. The correct answer is: "${
+                  getTodayQuestion().choices[getTodayQuestion().correct]
+                }"`}
+
+          </Typography>
+        )}
+      </DialogContent>
+      <DialogActions sx={{ p: 2, pt: 0 }}>
+        {!showFeedback && (
+          <Button onClick={handleSkipTask} color="inherit">
+            Skip for Now
+          </Button>
+        )}
+        {showFeedback && (
+          <Button
+            onClick={handleCloseDailyTask}
+            color="primary"
+            variant="contained"
+          >
+            Continue to Dashboard
+          </Button>
+        )}
+      </DialogActions>
+    </Dialog>
+  );
+
   return (
     <>
       <div style={staticDashboardBg} />
       <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', position: 'relative', zIndex: 1 }}>
+        {dailyTaskDialog}
         <AppBar position="static" sx={{ background: "#27187E" }}>
           <Toolbar>
             <IconButton
@@ -488,7 +730,7 @@ const Dashboard = () => {
               color="inherit"
               aria-label="open chatbot drawer"
               edge="end"
-              onClick={handleChatbotDrawerToggle}
+              onClick={() => setChatbotDrawerOpen(true)}
               sx={{ ml: 2 }}
             >
               <AIIcon fontSize="large" />
@@ -508,7 +750,7 @@ const Dashboard = () => {
         >
           {drawer}
         </Drawer>
-        {/* Add the right-side drawer for the chatbot */}
+        {/* Chatbot Drawer */}
         <Drawer
           anchor="right"
           open={chatbotDrawerOpen}
@@ -551,7 +793,6 @@ const Dashboard = () => {
           />
           {/* --- Drawer Content (chat UI) --- */}
           <Box sx={{ p: 2, borderBottom: '1px solid #393e6e', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-            {/* <AIIcon fontSize="large" /> */}
             <Typography variant="h6" sx={{ fontWeight: 700, color: "#fff" }}>
               AI Assistant
             </Typography>

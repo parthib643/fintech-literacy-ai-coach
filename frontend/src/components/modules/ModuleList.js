@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import api from '../../api/api';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import api from "../../api/api";
 import {
   Box,
   Typography,
@@ -14,13 +14,14 @@ import {
   LinearProgress,
   CircularProgress,
   Alert,
-} from '@mui/material';
+  Divider,
+} from "@mui/material";
 import {
   PlayArrow as PlayArrowIcon,
   CheckCircle as CheckCircleIcon,
   School as SchoolIcon,
-  Lock as LockIcon
-} from '@mui/icons-material';
+  Lock as LockIcon,
+} from "@mui/icons-material";
 
 // Helper function to get color by level
 const getLevelColor = (level) => {
@@ -41,11 +42,11 @@ const cardWidth = 367; // Use a fixed width for all cards
 const ModuleList = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  
+
   const [modules, setModules] = useState([]);
   const [progress, setProgress] = useState({});
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   // Add these handlers to fix the error
   const handleStartModule = (moduleId) => {
@@ -60,22 +61,31 @@ const ModuleList = () => {
     const fetchModulesAndProgress = async () => {
       try {
         setLoading(true);
-        const modulesResponse = await api.get('/modules');
+
+        // Fetch all modules
+        const modulesResponse = await api.get("/modules");
         setModules(modulesResponse.data);
+
+        // Fetch user progress if logged in
         if (user && user._id) {
           try {
             const progressResponse = await api.get(`/progress/${user._id}`);
+
+            // Convert progress array to object with moduleId as key for easier lookup
             const progressMap = {};
-            progressResponse.data.forEach(item => {
+            progressResponse.data.forEach((item) => {
               progressMap[item.module._id] = item;
             });
+
             setProgress(progressMap);
           } catch (progressError) {
+            console.error("Error fetching progress:", progressError);
             // Continue even if progress fetch fails
           }
         }
       } catch (err) {
-        setError('Failed to load modules. Please try again.');
+        console.error("Error fetching modules:", err);
+        setError("Failed to load modules. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -85,37 +95,71 @@ const ModuleList = () => {
   }, [user]);
 
   const getModuleStatus = (moduleId) => {
-    if (!user) return 'locked';
+    if (!user) return "locked";
+
     const moduleProgress = progress[moduleId];
+
     if (!moduleProgress) {
-      const moduleIndex = modules.findIndex(m => m._id === moduleId);
-      if (moduleIndex === 0) return 'available';
+      // Check if this is the first module or if previous module is completed
+      const moduleIndex = modules.findIndex((m) => m._id === moduleId);
+
+      if (moduleIndex === 0) return "available";
+
       const prevModuleId = modules[moduleIndex - 1]?._id;
-      if (prevModuleId && progress[prevModuleId]?.status === 'completed') {
-        return 'available';
+      if (prevModuleId && progress[prevModuleId]?.status === "completed") {
+        return "available";
       }
-      return 'locked';
+
+      return "locked";
     }
+
     return moduleProgress.status;
   };
 
   const getProgressPercentage = (moduleId) => {
     const moduleProgress = progress[moduleId];
+
     if (!moduleProgress) return 0;
-    if (moduleProgress.status === 'completed') return 100;
-    if (moduleProgress.status === 'in progress' && moduleProgress.currentSection) {
-      const module = modules.find(m => m._id === moduleId);
+
+    if (moduleProgress.status === "completed") return 100;
+
+    if (
+      moduleProgress.status === "in progress" &&
+      moduleProgress.currentSection
+    ) {
+      // Find the module to get total sections
+      const module = modules.find((m) => m._id === moduleId);
       if (module && module.totalSections) {
-        return Math.round((moduleProgress.currentSection / module.totalSections) * 100);
+        return Math.round(
+          (moduleProgress.currentSection / module.totalSections) * 100
+        );
       }
+
+      // If totalSections is not available, use a default value
       return Math.round((moduleProgress.currentSection / 5) * 100);
     }
+
     return 0;
+  };
+
+  const handleModuleClick = (moduleId, status) => {
+    if (status === "locked") {
+      return; // Do nothing for locked modules
+    }
+
+    navigate(`/module/${moduleId}`);
   };
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "50vh",
+        }}
+      >
         <CircularProgress />
       </Box>
     );
@@ -127,8 +171,8 @@ const ModuleList = () => {
 
   if (modules.length === 0) {
     return (
-      <Box sx={{ textAlign: 'center', py: 4 }}>
-        <SchoolIcon sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
+      <Box sx={{ textAlign: "center", py: 4 }}>
+        <SchoolIcon sx={{ fontSize: 60, color: "text.secondary", mb: 2 }} />
         <Typography variant="h6" color="text.secondary">
           No modules available yet.
         </Typography>
@@ -173,10 +217,10 @@ const ModuleList = () => {
                   else handleContinueModule(module._id);
                 }}
               >
-                {status === 'locked' && (
-                  <Box 
+                {status === "locked" && (
+                  <Box
                     sx={{
-                      position: 'absolute',
+                      position: "absolute",
                       top: 0,
                       left: 0,
                       right: 0,
@@ -189,7 +233,7 @@ const ModuleList = () => {
                       borderRadius: 3
                     }}
                   >
-                    <LockIcon sx={{ fontSize: 40, color: 'text.secondary' }} />
+                    <LockIcon sx={{ fontSize: 40, color: "text.secondary" }} />
                   </Box>
                 )}
                 <CardContent sx={{ flexGrow: 1 }}>
