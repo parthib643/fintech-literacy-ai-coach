@@ -39,6 +39,10 @@ import {
   Tab,
   Tabs,
   TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import {
   School as SchoolIcon,
@@ -53,6 +57,96 @@ import {
   Logout as LogoutIcon,
   Settings as SettingsIcon,
 } from "@mui/icons-material";
+
+// Daily financial literacy questions (can be moved to backend later)
+const dailyQuestions = [
+  {
+    question: "What is the difference between a savings account and a checking account?",
+    choices: [
+      "Savings accounts earn interest, checking accounts are for daily transactions.",
+      "Checking accounts earn more interest than savings accounts.",
+      "Savings accounts are only for businesses.",
+      "There is no difference.",
+    ],
+    correct: 0,
+  },
+  {
+    question: "Why is it important to have an emergency fund?",
+    choices: [
+      "To buy luxury items whenever you want.",
+      "To cover unexpected expenses without going into debt.",
+      "To invest in the stock market.",
+      "To pay regular monthly bills.",
+    ],
+    correct: 1,
+  },
+  {
+    question: "What does 'compound interest' mean?",
+    choices: [
+      "Interest calculated only on the initial amount.",
+      "Interest earned on both the initial amount and previously earned interest.",
+      "Interest that decreases over time.",
+      "Interest paid only at the end of the year.",
+    ],
+    correct: 1,
+  },
+  {
+    question: "How can budgeting help you manage your finances?",
+    choices: [
+      "By tracking income and expenses to control spending.",
+      "By increasing your salary automatically.",
+      "By eliminating all expenses.",
+      "By making you pay more taxes.",
+    ],
+    correct: 0,
+  },
+  {
+    question: "What is a credit score and why does it matter?",
+    choices: [
+      "A number showing your income level.",
+      "A number representing your creditworthiness, affecting loan approvals.",
+      "A score given to your bank account.",
+      "A score for your investment portfolio.",
+    ],
+    correct: 1,
+  },
+  {
+    question: "What are the risks and benefits of investing in stocks?",
+    choices: [
+      "Stocks are always safe and guarantee returns.",
+      "Stocks can offer high returns but also carry risk of loss.",
+      "Stocks never lose value.",
+      "Stocks are only for the wealthy.",
+    ],
+    correct: 1,
+  },
+  {
+    question: "What is the 50/30/20 rule in personal finance?",
+    choices: [
+      "50% savings, 30% rent, 20% fun.",
+      "50% needs, 30% wants, 20% savings.",
+      "50% investments, 30% shopping, 20% bills.",
+      "50% taxes, 30% food, 20% travel.",
+    ],
+    correct: 1,
+  },
+];
+
+// Get today's question based on date
+const getTodayQuestion = () => {
+  const today = new Date();
+  // Use UTC midnight to ensure question changes at 12:00 am
+  const startOfDay = new Date(
+    Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
+  );
+  // Calculate days since a fixed date (e.g., Jan 1, 2024)
+  const baseDate = new Date(Date.UTC(2024, 0, 1));
+  const diffDays = Math.floor((startOfDay - baseDate) / (1000 * 60 * 60 * 24));
+  const idx =
+    ((diffDays % dailyQuestions.length) + dailyQuestions.length) %
+    dailyQuestions.length;
+  return dailyQuestions[idx];
+};
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -75,6 +169,10 @@ const Dashboard = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
+
+  const [openDailyTask, setOpenDailyTask] = useState(true);
+  const [selectedChoice, setSelectedChoice] = useState(null);
+  const [showFeedback, setShowFeedback] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -167,6 +265,22 @@ const Dashboard = () => {
     setActiveTab(newValue);
   };
 
+  const handleSkipTask = () => {
+    setOpenDailyTask(false);
+    setSelectedChoice(null);
+    setShowFeedback(false);
+  };
+
+  const handleChoiceSelect = (idx) => {
+    setSelectedChoice(idx);
+    setShowFeedback(true);
+  };
+
+  useEffect(() => {
+    setSelectedChoice(null);
+    setShowFeedback(false);
+  }, [getTodayQuestion().question]);
+
   const drawer = (
     <Box sx={{ width: 250 }} role="presentation">
       <Box
@@ -180,6 +294,7 @@ const Dashboard = () => {
         <Avatar
           sx={{ width: 80, height: 80, mb: 2, bgcolor: "primary.main" }}
           alt={user?.name || "User"}
+          className="floating-avatar"
         >
           {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
         </Avatar>
@@ -257,111 +372,10 @@ const Dashboard = () => {
     </Box>
   );
 
-  // Daily financial literacy questions (can be moved to backend later)
-  const dailyQuestions = [
-    {
-      question:
-        "What is the difference between a savings account and a checking account?",
-      choices: [
-        "Savings accounts earn interest, checking accounts are for daily transactions.",
-        "Checking accounts earn more interest than savings accounts.",
-        "Savings accounts are only for businesses.",
-        "There is no difference.",
-      ],
-      correct: 0,
-    },
-    {
-      question: "Why is it important to have an emergency fund?",
-      choices: [
-        "To buy luxury items whenever you want.",
-        "To cover unexpected expenses without going into debt.",
-        "To invest in the stock market.",
-        "To pay regular monthly bills.",
-      ],
-      correct: 1,
-    },
-    {
-      question: "What does 'compound interest' mean?",
-      choices: [
-        "Interest calculated only on the initial amount.",
-        "Interest earned on both the initial amount and previously earned interest.",
-        "Interest that decreases over time.",
-        "Interest paid only at the end of the year.",
-      ],
-      correct: 1,
-    },
-    {
-      question: "How can budgeting help you manage your finances?",
-      choices: [
-        "By tracking income and expenses to control spending.",
-        "By increasing your salary automatically.",
-        "By eliminating all expenses.",
-        "By making you pay more taxes.",
-      ],
-      correct: 0,
-    },
-    {
-      question: "What is a credit score and why does it matter?",
-      choices: [
-        "A number showing your income level.",
-        "A number representing your creditworthiness, affecting loan approvals.",
-        "A score given to your bank account.",
-        "A score for your investment portfolio.",
-      ],
-      correct: 1,
-    },
-    {
-      question: "What are the risks and benefits of investing in stocks?",
-      choices: [
-        "Stocks are always safe and guarantee returns.",
-        "Stocks can offer high returns but also carry risk of loss.",
-        "Stocks never lose value.",
-        "Stocks are only for the wealthy.",
-      ],
-      correct: 1,
-    },
-    {
-      question: "What is the 50/30/20 rule in personal finance?",
-      choices: [
-        "50% savings, 30% rent, 20% fun.",
-        "50% needs, 30% wants, 20% savings.",
-        "50% investments, 30% shopping, 20% bills.",
-        "50% taxes, 30% food, 20% travel.",
-      ],
-      correct: 1,
-    },
-  ];
-
-  // Get today's question based on date
-  const getTodayQuestion = () => {
-    const today = new Date();
-    // Use UTC midnight to ensure question changes at 12:00 am
-    const startOfDay = new Date(
-      Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
-    );
-    // Calculate days since a fixed date (e.g., Jan 1, 2024)
-    const baseDate = new Date(Date.UTC(2024, 0, 1));
-    const diffDays = Math.floor(
-      (startOfDay - baseDate) / (1000 * 60 * 60 * 24)
-    );
-    const idx =
-      ((diffDays % dailyQuestions.length) + dailyQuestions.length) %
-      dailyQuestions.length;
-    return dailyQuestions[idx];
+  // Daily task handlers
+  const handleTaskAction = () => {
+    // Task handling logic here
   };
-
-  const [selectedChoice, setSelectedChoice] = useState(null);
-  const [showFeedback, setShowFeedback] = useState(false);
-
-  const handleChoiceSelect = (idx) => {
-    setSelectedChoice(idx);
-    setShowFeedback(true);
-  };
-
-  useEffect(() => {
-    setSelectedChoice(null);
-    setShowFeedback(false);
-  }, [getTodayQuestion().question]);
 
   if (loading) {
     return (
@@ -378,10 +392,119 @@ const Dashboard = () => {
     );
   }
 
+  // Define daily task dialog component
+  const dailyTaskDialog = (
+    <Dialog
+      open={openDailyTask}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 2,
+          p: 1,
+          background: "linear-gradient(to bottom, #ffffff, #f5f5fa)",
+        },
+      }}
+    >
+      <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <EmojiEventsIcon color="secondary" />
+        Daily Financial Challenge
+      </DialogTitle>
+      <DialogContent>
+        <Typography variant="subtitle1" sx={{ mb: 3 }}>
+          {getTodayQuestion().question}
+        </Typography>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+          {getTodayQuestion().choices.map((choice, idx) => {
+            let color = "primary";
+            let customStyles = {};
+            if (showFeedback) {
+              if (selectedChoice === idx) {
+                if (selectedChoice === getTodayQuestion().correct) {
+                  color = "success";
+                  customStyles = {
+                    backgroundColor: "#4caf50",
+                    color: "#fff",
+                    boxShadow: "0 0 0 4px #a5d6a7",
+                    borderColor: "#388e3c",
+                  };
+                } else {
+                  color = "error";
+                  customStyles = {
+                    backgroundColor: "#f44336",
+                    color: "#fff",
+                    boxShadow: "0 0 0 4px #ef9a9a",
+                    borderColor: "#b71c1c",
+                  };
+                }
+              }
+            }
+            return (
+              <Button
+                key={idx}
+                variant={selectedChoice === idx ? "contained" : "outlined"}
+                color={color}
+                onClick={() => handleChoiceSelect(idx)}
+                sx={{
+                  py: 1,
+                  textAlign: "left",
+                  transition: "box-shadow 0.2s",
+                  ...customStyles,
+                }}
+                disabled={showFeedback}
+              >
+                {choice}
+              </Button>
+            );
+          })}
+        </Box>
+        {showFeedback && (
+          <Typography
+            variant="body1"
+            sx={{ mt: 3, p: 2, borderRadius: 1 }}
+            color={
+              selectedChoice === getTodayQuestion().correct
+                ? "success.main"
+                : "error.main"
+            }
+            bgcolor={
+              selectedChoice === getTodayQuestion().correct
+                ? "success.light"
+                : "error.light"
+            }
+          >
+            {selectedChoice === getTodayQuestion().correct
+              ? "🎉 Correct! Well done."
+              : `❌ Incorrect. The correct answer is: "${
+                  getTodayQuestion().choices[getTodayQuestion().correct]
+                }"`}
+          </Typography>
+        )}
+      </DialogContent>
+      <DialogActions sx={{ p: 2, pt: 0 }}>
+        {!showFeedback && (
+          <Button onClick={handleSkipTask} color="inherit">
+            Skip for Now
+          </Button>
+        )}
+        {showFeedback && (
+          <Button
+            onClick={() => setOpenDailyTask(false)}
+            color="primary"
+            variant="contained"
+          >
+            Continue to Dashboard
+          </Button>
+        )}
+      </DialogActions>
+    </Dialog>
+  );
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <AppBar position="static">
-        <Toolbar>
+      {dailyTaskDialog}
+      <AppBar position="static" className="MuiAppBar-root" elevation={0}>
+        <Toolbar className="MuiToolbar-root">
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -392,7 +515,15 @@ const Dashboard = () => {
             <MenuIcon />
           </IconButton>
 
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{
+              flexGrow: 1,
+              fontSize: "1.5rem",
+              fontWeight: 600,
+            }}
+          >
             Fintech Literacy AI Coach
           </Typography>
 
@@ -403,34 +534,13 @@ const Dashboard = () => {
             aria-controls="menu-appbar"
             aria-haspopup="true"
             onClick={handleProfileMenuOpen}
-            color="inherit"
           >
             <AccountCircleIcon />
           </IconButton>
 
-          <Menu
-            id="menu-appbar"
-            anchorEl={anchorEl}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "right",
-            }}
-            keepMounted
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
-            open={Boolean(anchorEl)}
-            onClose={handleProfileMenuClose}
-          >
-            <MenuItem onClick={handleProfileMenuClose}>Profile</MenuItem>
-            <MenuItem onClick={handleProfileMenuClose}>My account</MenuItem>
-            <MenuItem onClick={handleLogout}>Logout</MenuItem>
-          </Menu>
           <IconButton
             size="large"
             edge="end"
-            color="inherit"
             aria-label="open AI assistant"
             onClick={() => setAiDrawerOpen(true)}
             sx={{ ml: 1 }}
@@ -441,7 +551,94 @@ const Dashboard = () => {
       </AppBar>
 
       <Drawer anchor="left" open={drawerOpen} onClose={handleDrawerToggle}>
-        {drawer}
+        <Box sx={{ width: 250 }} role="presentation">
+          <Box
+            sx={{
+              p: 2,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <Avatar
+              sx={{ width: 80, height: 80, mb: 2, bgcolor: "primary.main" }}
+              alt={user?.name || "User"}
+              className="floating-avatar"
+            >
+              {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+            </Avatar>
+            <Typography variant="h6">{user?.name || "User"}</Typography>
+            <Typography variant="body2" color="text.secondary">
+              {user?.email || ""}
+            </Typography>
+          </Box>
+
+          <Divider />
+
+          <List>
+            <ListItem
+              button
+              onClick={() => setActiveTab(0)}
+              selected={activeTab === 0}
+            >
+              <ListItemIcon>
+                <DashboardIcon />
+              </ListItemIcon>
+              <ListItemText primary="Overview" />
+            </ListItem>
+
+            <ListItem
+              button
+              onClick={() => setActiveTab(1)}
+              selected={activeTab === 1}
+            >
+              <ListItemIcon>
+                <SchoolIcon />
+              </ListItemIcon>
+              <ListItemText primary="Modules" />
+            </ListItem>
+
+            <ListItem
+              button
+              onClick={() => setActiveTab(2)}
+              selected={activeTab === 2}
+            >
+              <ListItemIcon>
+                <TrendingUpIcon />
+              </ListItemIcon>
+              <ListItemText primary="Progress" />
+            </ListItem>
+
+            <ListItem
+              button
+              onClick={() => setActiveTab(3)}
+              selected={activeTab === 3}
+            >
+              <ListItemIcon>
+                <EmojiEventsIcon />
+              </ListItemIcon>
+              <ListItemText primary="Achievements" />
+            </ListItem>
+          </List>
+
+          <Divider />
+
+          <List>
+            <ListItem button>
+              <ListItemIcon>
+                <SettingsIcon />
+              </ListItemIcon>
+              <ListItemText primary="Settings" />
+            </ListItem>
+
+            <ListItem button onClick={handleLogout}>
+              <ListItemIcon>
+                <LogoutIcon />
+              </ListItemIcon>
+              <ListItemText primary="Logout" />
+            </ListItem>
+          </List>
+        </Box>
       </Drawer>
 
       <Drawer
@@ -501,7 +698,7 @@ const Dashboard = () => {
 
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4, flexGrow: 1 }}>
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
+          <Alert severity="error" sx={{ mb: 2 }} className="fade-in">
             {error}
           </Alert>
         )}
@@ -515,12 +712,12 @@ const Dashboard = () => {
               height: "50vh",
             }}
           >
-            <CircularProgress />
+            <CircularProgress className="MuiCircularProgress-root" />
           </Box>
         ) : (
           <>
-            <Box sx={{ mb: 4 }}>
-              <Paper sx={{ p: 3 }}>
+            <Box sx={{ mb: 4 }} className="fade-in">
+              <Paper sx={{ p: 3 }} className="MuiPaper-root">
                 <Typography variant="h4" gutterBottom>
                   Welcome, {user?.name || "Learner"}!
                 </Typography>
@@ -530,13 +727,14 @@ const Dashboard = () => {
               </Paper>
             </Box>
 
-            <Box sx={{ width: "100%" }}>
+            <Box sx={{ width: "100%" }} className="fade-in">
               <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
                 <Tabs
                   value={activeTab}
                   onChange={handleTabChange}
                   aria-label="dashboard tabs"
                   variant="fullWidth"
+                  className="MuiTabs-root"
                 >
                   <Tab icon={<DashboardIcon />} label="Overview" />
                   <Tab icon={<SchoolIcon />} label="Modules" />
@@ -551,14 +749,7 @@ const Dashboard = () => {
                   {/* Learning Path */}
                   {path && (
                     <Grid item xs={12} md={4}>
-                      <Paper
-                        sx={{
-                          p: 3,
-                          display: "flex",
-                          flexDirection: "column",
-                          height: "100%",
-                        }}
-                      >
+                      <Paper sx={{ p: 3 }} className="MuiPaper-root scale-up">
                         <Box
                           sx={{ display: "flex", alignItems: "center", mb: 2 }}
                         >
@@ -596,9 +787,7 @@ const Dashboard = () => {
 
                   {/* Progress Summary */}
                   <Grid item xs={12} md={path ? 8 : 12}>
-                    <Paper
-                      sx={{ p: 3, display: "flex", flexDirection: "column" }}
-                    >
+                    <Paper sx={{ p: 3 }} className="MuiPaper-root scale-up">
                       <Box
                         sx={{ display: "flex", alignItems: "center", mb: 2 }}
                       >
@@ -644,100 +833,6 @@ const Dashboard = () => {
                     </Paper>
                   </Grid>
 
-                  {/* Daily Task Section */}
-                  <Grid item xs={12}>
-                    <Paper sx={{ p: 3, mb: 3, background: "#f5f5fa" }}>
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", mb: 1 }}
-                      >
-                        <EmojiEventsIcon color="secondary" sx={{ mr: 1 }} />
-                        <Typography variant="h6">Daily Task</Typography>
-                      </Box>
-                      <Divider sx={{ mb: 2 }} />
-                      <Typography variant="subtitle1" sx={{ mb: 2 }}>
-                        {getTodayQuestion().question}
-                      </Typography>
-                      <Box>
-                        {getTodayQuestion().choices.map((choice, idx) => {
-                          let color = "primary";
-                          let customStyles = {};
-                          if (showFeedback) {
-                            if (selectedChoice === idx) {
-                              if (
-                                selectedChoice === getTodayQuestion().correct
-                              ) {
-                                color = "success";
-                                customStyles = {
-                                  backgroundColor: "#4caf50",
-                                  color: "#fff",
-                                  boxShadow: "0 0 0 4px #a5d6a7",
-                                  borderColor: "#388e3c",
-                                };
-                              } else {
-                                color = "error";
-                                customStyles = {
-                                  backgroundColor: "#f44336",
-                                  color: "#fff",
-                                  boxShadow: "0 0 0 4px #ef9a9a",
-                                  borderColor: "#b71c1c",
-                                };
-                              }
-                            }
-                          }
-                          return (
-                            <Button
-                              key={idx}
-                              variant={
-                                selectedChoice === idx
-                                  ? "contained"
-                                  : "outlined"
-                              }
-                              color={color}
-                              onClick={() => handleChoiceSelect(idx)}
-                              sx={{
-                                mb: 1,
-                                mr: 1,
-                                textAlign: "left",
-                                minWidth: 250,
-                                transition: "box-shadow 0.2s",
-                                ...customStyles,
-                              }}
-                              disabled={showFeedback}
-                            >
-                              {choice}
-                            </Button>
-                          );
-                        })}
-                      </Box>
-                      {showFeedback && (
-                        <Typography
-                          variant="body2"
-                          sx={{ mt: 2 }}
-                          color={
-                            selectedChoice === getTodayQuestion().correct
-                              ? "success.main"
-                              : "error.main"
-                          }
-                        >
-                          {selectedChoice === getTodayQuestion().correct
-                            ? "Correct! Well done."
-                            : `Incorrect. The correct answer is: "${
-                                getTodayQuestion().choices[
-                                  getTodayQuestion().correct
-                                ]
-                              }"`}
-                        </Typography>
-                      )}
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mt: 2 }}
-                      >
-                        Come back tomorrow for a new challenge!
-                      </Typography>
-                    </Paper>
-                  </Grid>
-
                   {/* Available Modules */}
                   <Grid item xs={12}>
                     <Chatbot />
@@ -752,13 +847,7 @@ const Dashboard = () => {
                         const status = getModuleStatus(module._id);
                         return (
                           <Grid item xs={12} sm={6} md={4} key={module._id}>
-                            <Card
-                              sx={{
-                                height: "100%",
-                                display: "flex",
-                                flexDirection: "column",
-                              }}
-                            >
+                            <Card className="MuiCard-root card-animate">
                               <CardContent sx={{ flexGrow: 1 }}>
                                 <Box
                                   sx={{

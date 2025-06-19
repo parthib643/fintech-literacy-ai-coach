@@ -1,13 +1,301 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
+    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  background: linear-gradient(45deg, #e0e7ff, #f0fdfa, #e0e7ff, #f0fdfa);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  min-height: 100vh;
+  color: #22223b;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@keyframes gradientBG {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Continuously Floating Cards */
+.MuiCard-root {
+  animation: floatingCard 6s ease-in-out infinite;
+}
+
+@keyframes floatingCard {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Continuous Gradient Border for Buttons */
+.MuiButton-root {
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  z-index: 1;
+  animation: borderGradient 4s linear infinite;
+}
+
+@keyframes borderGradient {
+  0% {
+    box-shadow: 0 0 10px #6366f1;
+  }
+  50% {
+    box-shadow: 0 0 20px #06b6d4;
+  }
+  100% {
+    box-shadow: 0 0 10px #6366f1;
+  }
+}
+
+/* Breathing Avatar Effect */
+.MuiAvatar-root {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Continuous Progress Bar Animation */
+.MuiLinearProgress-root {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, #6366f1 0%, #06b6d4 50%, #6366f1 100%);
+  background-size: 200% 100%;
+  animation: progressGradient 3s linear infinite;
+}
+
+@keyframes progressGradient {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* Continuous Glow Effect for Icons */
+.MuiSvgIcon-root {
+  animation: iconGlow 3s ease-in-out infinite;
+}
+
+@keyframes iconGlow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 2px rgba(99, 102, 241, 0.2));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.6));
+  }
+}
+
+/* Subtle Rotate for Loading Indicators */
+.MuiCircularProgress-root {
+  animation: rotateProgress 2s linear infinite;
+}
+
+@keyframes rotateProgress {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Tab Indicator Animation */
+.MuiTabs-indicator {
+  background: linear-gradient(90deg, #6366f1, #06b6d4, #6366f1);
+  background-size: 200% 100%;
+  animation: tabGradient 3s linear infinite;
+}
+
+@keyframes tabGradient {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* Paper/Card Glassmorphism with Constant Animation */
+.MuiPaper-root {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(8px);
+  border-radius: 18px !important;
+  animation: paperGlow 4s ease-in-out infinite;
+}
+
+@keyframes paperGlow {
+  0%,
+  100% {
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.1);
+  }
+  50% {
+    box-shadow: 0 8px 32px rgba(6, 182, 212, 0.2);
+  }
+}
+
+/* Smooth Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  background: #e0e7ff;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #6366f1, #06b6d4);
+  border-radius: 8px;
+}
+
+/* Simple Typography */
+h1,
+.MuiTypography-h1 {
+  font-size: 2.8rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+h2,
+.MuiTypography-h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+h3,
+.MuiTypography-h3 {
+  font-size: 1.7rem;
+  font-weight: 600;
+}
+h4,
+.MuiTypography-h4 {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  h1,
+  .MuiTypography-h1 {
+    font-size: 2rem;
+  }
+  h2,
+  .MuiTypography-h2 {
+    font-size: 1.5rem;
+  }
+  h3,
+  .MuiTypography-h3 {
+    font-size: 1.2rem;
+  }
+}
+
+/* Enhanced Navbar Styling */
+.MuiAppBar-root {
+  background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%) !important;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.2) !important;
+}
+
+.MuiToolbar-root {
+  padding: 0.8rem 1.2rem !important;
+}
+
+/* Make Navbar Icons Visible and Add Effects */
+.MuiAppBar-root .MuiIconButton-root {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  margin: 0 0.3rem;
+  padding: 0.6rem;
+  transition: all 0.3s ease;
+}
+
+.MuiAppBar-root .MuiIconButton-root:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.MuiAppBar-root .MuiSvgIcon-root {
+  color: white !important;
+  font-size: 1.4rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Navbar Brand Text */
+.MuiAppBar-root .MuiTypography-root {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  background: linear-gradient(90deg, #ffffff, #e0e7ff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Drawer Styling */
+.MuiDrawer-paper {
+  background: linear-gradient(180deg, #f8faff 0%, #ffffff 100%) !important;
+  border-right: none !important;
+}
+
+/* Drawer List Items */
+.MuiListItem-root {
+  margin: 0.3rem 0.8rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.MuiListItem-root:hover {
+  background: rgba(99, 102, 241, 0.08) !important;
+}
+
+.MuiListItem-root.Mui-selected {
+  background: linear-gradient(
+    90deg,
+    rgba(99, 102, 241, 0.15),
+    rgba(6, 182, 212, 0.15)
+  ) !important;
+}
+
+.MuiListItem-root .MuiListItemIcon-root {
+  color: #6366f1;
+  min-width: 40px;
+}
+
+.MuiListItem-root.Mui-selected .MuiListItemIcon-root {
+  color: #06b6d4;
+}
+
+.MuiListItem-root .MuiListItemText-primary {
+  font-weight: 500;
+  color: #1e293b;
+}
+
+/* Avatar in Drawer */
+.MuiDrawer-paper .MuiAvatar-root {
+  border: 3px solid #ffffff;
+  box-shadow: 0 0 0 2px #6366f1;
+  transition: all 0.3s ease;
+}
+
+.MuiDrawer-paper .MuiAvatar-root:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 0 3px #06b6d4;
+}
+
+/* Divider in Drawer */
+.MuiDrawer-paper .MuiDivider-root {
+  margin: 1rem 0;
+  background: linear-gradient(90deg, transparent, #e0e7ff, transparent);
 }
