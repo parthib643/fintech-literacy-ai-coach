@@ -47,7 +47,7 @@ function App() {
           } />
 
 
-          <Route path="/modules/:moduleId" element={<ModuleDetail />} />
+          <Route path="/module-detail/:moduleId" element={<ModuleDetail />} />
 
 
         </Routes>

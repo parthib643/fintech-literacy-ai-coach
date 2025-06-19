@@ -10,12 +10,12 @@ const api = axios.create({
 
 // Authentication endpoints
 export const register = async (userData) => {
-    console.log("🚀 Sending register data:", userData);  // Frontend log
+    console.log("Sending register data:", userData);  // Frontend log
   try {
     const response = await api.post('/users/register', userData);
     return response.data;
   } catch (error) {
-    console.error("❌ Register API error:", error);
+    console.error("Register API error:", error);
     throw error.response?.data || error.message;
   }
 };
