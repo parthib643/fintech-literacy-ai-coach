@@ -1,3 +1,176 @@
+/* Universal background and font for the whole app */
+body, #root, .App {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #232946 0%, #27187E 100%);
+  color: #fff;
+  font-family: 'Inter', 'Roboto', 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Remove default scrollbars and add custom style */
+::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #393e6e;
+  border-radius: 4px;
+}
+
+/* Headings and text */
+h1, h2, h3, h4, h5, h6, .MuiTypography-h1, .MuiTypography-h2, .MuiTypography-h3, .MuiTypography-h4, .MuiTypography-h5, .MuiTypography-h6 {
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+a, .App-link {
+  color: #f96d00;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+a:hover, .App-link:hover {
+  color: #6c63ff;
+}
+
+/* Card-like containers */
+.MuiCard-root, .card, .module-card, .MuiPaper-root {
+  background: rgba(30, 30, 60, 0.85) !important;
+  border-radius: 18px !important;
+  color: #fff !important;
+  box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.15) !important;
+}
+
+/* Buttons */
+button, .MuiButton-root {
+  background: linear-gradient(90deg, #f96d00 0%, #6c63ff 100%) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  box-shadow: 0 4px 16px rgba(108,99,255,0.25) !important;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+button:hover, .MuiButton-root:hover {
+  background: linear-gradient(90deg, #6c63ff 0%, #f96d00 100%) !important;
+}
+
+/* Chips */
+.MuiChip-root {
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+}
+
+/* Inputs */
+input, .MuiInputBase-root {
+  background: rgba(44, 44, 84, 0.85) !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+  border: none !important;
+  padding: 10px 14px !important;
+}
+
+/* Drawer and AppBar */
+.MuiDrawer-paper, .MuiAppBar-root {
+  background: linear-gradient(180deg, #232946 0%, #27187E 100%) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
+}
+
+/* Divider */
+.MuiDivider-root {
+  background-color: #393e6e !important;
+}
+
+/* Avatar */
+.MuiAvatar-root {
+  background-color: #6c63ff !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  font-size: 2rem !important;
+  box-shadow: 0 2px 12px #6c63ff55 !important;
+}
+
+/* Responsive grid gap for module cards */
+.MuiGrid-container {
+  gap: 24px !important;
+}
+
+/* Alerts */
+.MuiAlert-root {
+  border-radius: 10px !important;
+  font-size: 1rem !important;
+}
+
+/* Remove outline on focus for a cleaner look */
+*:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px #6c63ff55 !important;
+}
+
+/* Utility classes */
+.text-gradient {
+  background: linear-gradient(90deg, #f96d00 0%, #6c63ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text; /* Add this line for compatibility */
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+}
+
+/* For chat bubbles, if you use them */
+.chat-bubble {
+  border-radius: 18px;
+  padding: 12px 18px;
+  margin-bottom: 8px;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  font-size: 1rem;
+}
+
+/* For user chat bubbles */
+.chat-bubble.user {
+  background: linear-gradient(90deg, #f96d00 0%, #6c63ff 100%);
+  color: #fff;
+  align-self: flex-end;
+}
+
+/* For bot chat bubbles */
+.chat-bubble.bot {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  align-self: flex-start;
+}
+
+/* Animated gradient for landing page (optional, for reference) */
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  25% { background-position: 50% 100%; }
+  50% { background-position: 100% 50%; }
+  75% { background-position: 50% 0%; }
+  100% { background-position: 0% 50%; }
+}
+.lively-bg {
+  min-height: 100vh;
+  width: 100vw;
+  background: linear-gradient(270deg, #27187E, #3B1E9A, #2D1773, #f96d00, #6c63ff, #27187E, #f96d00, #3B1E9A);
+  background-size: 2000% 2000%;
+  animation: gradientBG 24s ease-in-out infinite;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  transition: background 0.5s;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
 .App {
   text-align: center;
 }

@@ -115,19 +115,30 @@ const Achievements = () => {
   const unlockedCount = displayAchievements.filter(a => a.unlocked).length;
 
   return (
-    <Paper sx={{ p: 3, mt: 3 }}>
+    <Paper
+      sx={{
+        p: 3,
+        mt: 3,
+        background: "rgba(30, 30, 60, 0.85)",
+        borderRadius: 3,
+        color: "#fff",
+        boxShadow: '0 4px 24px 0 rgba(31, 38, 135, 0.15)'
+      }}
+    >
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <EmojiEventsIcon sx={{ color: 'gold', mr: 1 }} />
-        <Typography variant="h5">Achievements</Typography>
+        <EmojiEventsIcon sx={{ color: '#FFD700', mr: 1, fontSize: 32 }} />
+        <Typography variant="h5" sx={{ color: "#fff", fontWeight: 700 }}>
+          Achievements
+        </Typography>
       </Box>
       
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+      <Typography variant="body2" sx={{ mb: 3, color: "#bbb" }}>
         You've unlocked {unlockedCount} out of {displayAchievements.length} achievements.
       </Typography>
       
-      <Divider sx={{ mb: 3 }} />
+      <Divider sx={{ mb: 3, background: "#393e6e" }} />
       
-      <Grid container spacing={2}>
+      <Grid container spacing={3}>
         {displayAchievements.map((achievement) => (
           <Grid item xs={12} sm={6} md={4} key={achievement.id}>
             <Tooltip 
@@ -141,10 +152,16 @@ const Achievements = () => {
                   height: '100%',
                   opacity: achievement.unlocked ? 1 : 0.6,
                   position: 'relative',
-                  transition: 'transform 0.2s',
+                  background: "rgba(44, 44, 84, 0.95)",
+                  borderRadius: 3,
+                  color: "#fff",
+                  boxShadow: achievement.unlocked ? '0 8px 32px 0 rgba(108,99,255,0.15)' : 'none',
+                  border: achievement.unlocked ? '1.5px solid #6c63ff' : '1.5px solid #393e6e',
+                  transition: 'transform 0.2s, box-shadow 0.2s, border 0.2s',
                   '&:hover': {
                     transform: achievement.unlocked ? 'scale(1.03)' : 'none',
-                    boxShadow: achievement.unlocked ? 2 : 0
+                    boxShadow: achievement.unlocked ? '0 12px 24px rgba(108,99,255,0.35)' : 'none',
+                    border: achievement.unlocked ? '1.5px solid #f96d00' : '1.5px solid #393e6e'
                   }
                 }}
               >
@@ -159,11 +176,12 @@ const Achievements = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                      zIndex: 1
+                      backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                      zIndex: 1,
+                      borderRadius: 3
                     }}
                   >
-                    <LockIcon sx={{ fontSize: 30, color: 'text.secondary' }} />
+                    <LockIcon sx={{ fontSize: 30, color: '#393e6e' }} />
                   </Box>
                 )}
                 
@@ -173,16 +191,16 @@ const Achievements = () => {
                       {achievement.icon}
                     </Typography>
                     
-                    <Typography variant="h6" component="div" gutterBottom>
+                    <Typography variant="h6" component="div" gutterBottom sx={{ color: "#fff", fontWeight: 700 }}>
                       {achievement.title}
                     </Typography>
                     
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: "#bbb" }}>
                       {achievement.description}
                     </Typography>
                     
                     {achievement.unlocked && achievement.dateEarned && (
-                      <Typography variant="caption" color="success.main" sx={{ mt: 2, display: 'block' }}>
+                      <Typography variant="caption" color="#10A37F" sx={{ mt: 2, display: 'block' }}>
                         Earned on {new Date(achievement.dateEarned).toLocaleDateString()}
                       </Typography>
                     )}
