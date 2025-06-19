@@ -170,9 +170,19 @@ const Dashboard = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
 
-  const [openDailyTask, setOpenDailyTask] = useState(true);
+  const [openDailyTask, setOpenDailyTask] = useState(false);
   const [selectedChoice, setSelectedChoice] = useState(null);
   const [showFeedback, setShowFeedback] = useState(false);
+
+  // Check if daily task should be shown
+  useEffect(() => {
+    const lastShownDate = localStorage.getItem('lastDailyTaskDate');
+    const today = new Date().toDateString();
+    
+    if (lastShownDate !== today) {
+      setOpenDailyTask(true);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -265,10 +275,18 @@ const Dashboard = () => {
     setActiveTab(newValue);
   };
 
+  // Handler for closing the daily task dialog
+  const handleCloseDailyTask = () => {
+    setOpenDailyTask(false);
+    localStorage.setItem('lastDailyTaskDate', new Date().toDateString());
+  };
+
   const handleSkipTask = () => {
     setOpenDailyTask(false);
     setSelectedChoice(null);
     setShowFeedback(false);
+    // Store today's date in localStorage
+    localStorage.setItem('lastDailyTaskDate', new Date().toDateString());
   };
 
   const handleChoiceSelect = (idx) => {
@@ -489,7 +507,7 @@ const Dashboard = () => {
         )}
         {showFeedback && (
           <Button
-            onClick={() => setOpenDailyTask(false)}
+            onClick={handleCloseDailyTask}
             color="primary"
             variant="contained"
           >
