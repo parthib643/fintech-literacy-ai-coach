@@ -49,11 +49,11 @@ const ModuleList = () => {
 
   // Add these handlers to fix the error
   const handleStartModule = (moduleId) => {
-    navigate(`/modules/${moduleId}`);
+    navigate(`/module/${moduleId}`);
   };
 
   const handleContinueModule = (moduleId) => {
-    navigate(`/modules/${moduleId}`);
+    navigate(`/module/${moduleId}`);
   };
 
   useEffect(() => {
