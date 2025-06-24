@@ -43,7 +43,6 @@ const Assessment = () => {
   const [error, setError] = useState('');
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState(null);
   const [showResults, setShowResults] = useState(false);
   const [achievementDialog, setAchievementDialog] = useState(false);
@@ -117,7 +116,6 @@ const Assessment = () => {
       return;
     }
 
-    setSubmitted(true);
     const calculatedScore = calculateScore();
     setScore(calculatedScore);
     setShowResults(true);
@@ -156,7 +154,6 @@ const Assessment = () => {
 
   const handleRetakeAssessment = () => {
     setCurrentQuestion(0);
-    setSubmitted(false);
     setScore(null);
     setShowResults(false);
     const initialAnswers = {};
@@ -245,10 +242,10 @@ const Assessment = () => {
                     </Typography>
                     
                       <Typography variant="body2" >
-                        <strong >Correct answer:</strong> {' '}
-  {Number.isInteger(Number(question.correctAnswer)) && question.options[Number(question.correctAnswer)] !== undefined
-    ? question.options[Number(question.correctAnswer)]
-    : 'Invalid correctAnswer index'}
+                        <strong >Correct answer:</strong> {" "}
+                        {Number.isInteger(Number(question.correctAnswer)) && question.options[Number(question.correctAnswer)] !== undefined
+                          ? question.options[Number(question.correctAnswer)]
+                          : 'Invalid correctAnswer index'}
                       </Typography>
                     
                   </Box>

@@ -283,11 +283,6 @@ const Dashboard = () => {
     fetchData();
   }, [user]);
 
-  const getModuleStatus = (moduleId) => {
-    const moduleProgress = progress.find((p) => p.module._id === moduleId);
-    return moduleProgress ? moduleProgress.status : "not started";
-  };
-
   const handleStartModule = (moduleId) => {
     navigate(`/module/${moduleId}`);
   };
@@ -340,10 +335,13 @@ const Dashboard = () => {
     localStorage.setItem('lastDailyTaskDate', new Date().toDateString());
   };
 
+  // For useEffect dependency: extract today's question
+  const todayQuestion = getTodayQuestion().question;
+
   useEffect(() => {
     setSelectedChoice(null);
     setShowFeedback(false);
-  }, [getTodayQuestion().question]);
+  }, [todayQuestion]);
 
   // Drawer resizing logic (mouse only)
   useEffect(() => {
@@ -586,40 +584,46 @@ const Dashboard = () => {
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: 2,
+          borderRadius: 3,
           p: 1,
-          background: "linear-gradient(to bottom, #ffffff, #f5f5fa)",
+          background: "rgba(30, 30, 60, 0.95)",
+          color: "#fff",
+          boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
         },
       }}
     >
-      <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1, color: '#fff' }}>
         <EmojiEventsIcon color="secondary" />
         Daily Financial Challenge
       </DialogTitle>
       <DialogContent>
-        <Typography variant="subtitle1" sx={{ mb: 3 }}>
+        <Typography variant="subtitle1" sx={{ mb: 3, color: '#fff' }}>
           {getTodayQuestion().question}
         </Typography>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
           {getTodayQuestion().choices.map((choice, idx) => {
             let color = "primary";
-            let customStyles = {};
+            let customStyles = {
+              background: 'rgba(44,44,84,0.85)',
+              color: '#fff',
+              borderColor: '#393e6e',
+            };
             if (showFeedback) {
               if (selectedChoice === idx) {
                 if (selectedChoice === getTodayQuestion().correct) {
                   color = "success";
                   customStyles = {
-                    backgroundColor: "#4caf50",
+                    background: "#2e7d32",
                     color: "#fff",
-                    boxShadow: "0 0 0 4px #a5d6a7",
+                    boxShadow: "0 0 0 4px #388e3c55",
                     borderColor: "#388e3c",
                   };
                 } else {
                   color = "error";
                   customStyles = {
-                    backgroundColor: "#f44336",
+                    background: "#b71c1c",
                     color: "#fff",
-                    boxShadow: "0 0 0 4px #ef9a9a",
+                    boxShadow: "0 0 0 4px #b71c1c55",
                     borderColor: "#b71c1c",
                   };
                 }
@@ -647,30 +651,17 @@ const Dashboard = () => {
         {showFeedback && (
           <Typography
             variant="body1"
-            sx={{ mt: 3, p: 2, borderRadius: 1 }}
-            color={
-              selectedChoice === getTodayQuestion().correct
-                ? "success.main"
-                : "error.main"
-            }
-            bgcolor={
-              selectedChoice === getTodayQuestion().correct
-                ? "success.light"
-                : "error.light"
-            }
+            sx={{ mt: 3, p: 2, borderRadius: 2, color: '#fff', background: selectedChoice === getTodayQuestion().correct ? '#2e7d32' : '#b71c1c' }}
           >
             {selectedChoice === getTodayQuestion().correct
               ? "🎉 Correct! Well done."
-              : `❌ Incorrect. The correct answer is: "${
-                  getTodayQuestion().choices[getTodayQuestion().correct]
-                }"`}
-
+              : `❌ Incorrect. The correct answer is: ${getTodayQuestion().choices[getTodayQuestion().correct]}`}
           </Typography>
         )}
       </DialogContent>
       <DialogActions sx={{ p: 2, pt: 0 }}>
         {!showFeedback && (
-          <Button onClick={handleSkipTask} color="inherit">
+          <Button onClick={handleSkipTask} color="inherit" sx={{ color: '#bbb' }}>
             Skip for Now
           </Button>
         )}
@@ -679,6 +670,7 @@ const Dashboard = () => {
             onClick={handleCloseDailyTask}
             color="primary"
             variant="contained"
+            sx={{ background: 'linear-gradient(90deg, #f96d00 0%, #6c63ff 100%)', color: '#fff' }}
           >
             Continue to Dashboard
           </Button>
@@ -910,7 +902,7 @@ const Dashboard = () => {
                     {/* Learning Path */}
                     {path && (
                       <Grid item xs={12} md={4}>
-                        <Paper sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%', background: "rgba(30, 30, 60, 0.85)", borderRadius: 3, color: "#fff" }}>
+                        <Paper sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '87%', background: "rgba(30, 30, 60, 0.85)", borderRadius: 3, color: "#fff" }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                             <TimelineIcon sx={{ mr: 1 }} color="primary" />
                             <Typography variant="h6">Your Learning Path</Typography>

@@ -141,13 +141,7 @@ const ModuleList = () => {
     return 0;
   };
 
-  const handleModuleClick = (moduleId, status) => {
-    if (status === "locked") {
-      return; // Do nothing for locked modules
-    }
-
-    navigate(`/module/${moduleId}`);
-  };
+  
 
   if (loading) {
     return (
@@ -195,6 +189,9 @@ const ModuleList = () => {
                   width: cardWidth,
                   minWidth: cardWidth,
                   maxWidth: cardWidth,
+                  height: status === 'in progress' ? 230 : 200, // Expand if progress bar, else default size
+                  minHeight: status === 'in progress' ? 230 : 200,
+                  maxHeight: status === 'in progress' ? 230 : 200,
                   borderRadius: 3,
                   color: "#fff",
                   boxShadow: '0 4px 24px 0 rgba(31, 38, 135, 0.15)',
@@ -205,7 +202,7 @@ const ModuleList = () => {
                   position: 'relative',
                   opacity: status === 'locked' ? 0.7 : 1,
                   cursor: status === 'locked' ? 'not-allowed' : 'pointer',
-                  transition: 'box-shadow 0.2s',
+                  transition: 'box-shadow 0.2s, height 0.3s cubic-bezier(.4,2,.6,1)',
                   '&:hover': {
                     boxShadow: status !== 'locked' ? '0 12px 24px rgba(108,99,255,0.35)' : undefined,
                   }
