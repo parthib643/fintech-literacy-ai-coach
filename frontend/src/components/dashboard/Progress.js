@@ -113,13 +113,23 @@ const Progress = () => {
   }
 
   return (
-    <Paper sx={{ p: 3 }}>
+    <Paper
+      sx={{
+        p: 3,
+        background: "rgba(30, 30, 60, 0.85)",
+        borderRadius: 3,
+        color: "#fff",
+        boxShadow: '0 4px 24px 0 rgba(31, 38, 135, 0.15)'
+      }}
+    >
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <TrendingUpIcon sx={{ color: 'primary.main', mr: 1 }} />
-        <Typography variant="h5">Your Learning Progress</Typography>
+        <TrendingUpIcon sx={{ color: '#6c63ff', mr: 1, fontSize: 32 }} />
+        <Typography variant="h5" sx={{ color: "#fff", fontWeight: 700 }}>
+          Your Learning Progress
+        </Typography>
       </Box>
       
-      <Divider sx={{ mb: 3 }} />
+      <Divider sx={{ mb: 3, background: "#393e6e" }} />
       
       {/* Progress Overview */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -130,7 +140,7 @@ const Progress = () => {
               value={stats.overallProgress} 
               size={180} 
               thickness={5} 
-              sx={{ color: stats.overallProgress === 100 ? 'success.main' : 'primary.main' }}
+              sx={{ color: stats.overallProgress === 100 ? '#10A37F' : '#6c63ff', background: 'transparent' }}
             />
             <Box
               sx={{
@@ -145,10 +155,10 @@ const Progress = () => {
                 flexDirection: 'column'
               }}
             >
-              <Typography variant="h4" component="div" color="text.primary">
+              <Typography variant="h4" component="div" sx={{ color: "#fff", fontWeight: 700 }}>
                 {stats.overallProgress}%
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{ color: "#bbb" }}>
                 Overall Progress
               </Typography>
             </Box>
@@ -156,43 +166,53 @@ const Progress = () => {
         </Grid>
         
         <Grid item xs={12} md={6}>
-          <Card variant="outlined" sx={{ height: '100%' }}>
+          <Card
+            variant="outlined"
+            sx={{
+              height: '100%',
+              background: "rgba(44, 44, 84, 0.95)",
+              borderRadius: 3,
+              color: "#fff",
+              boxShadow: '0 4px 24px 0 rgba(108,99,255,0.10)',
+              border: '1.5px solid #393e6e'
+            }}
+          >
             <CardContent>
-              <Typography variant="h6" gutterBottom>Progress Summary</Typography>
+              <Typography variant="h6" gutterBottom sx={{ color: "#fff", fontWeight: 700 }}>Progress Summary</Typography>
               
               <Box sx={{ mb: 2 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                  <Typography variant="body2">Completed</Typography>
-                  <Typography variant="body2">{stats.completed} of {stats.totalModules}</Typography>
+                  <Typography variant="body2" sx={{ color: "#bbb" }}>Completed</Typography>
+                  <Typography variant="body2" sx={{ color: "#bbb" }}>{stats.completed} of {stats.totalModules}</Typography>
                 </Box>
                 <LinearProgress 
                   variant="determinate" 
                   value={(stats.completed / stats.totalModules) * 100} 
-                  sx={{ height: 8, borderRadius: 5, bgcolor: 'success.light', '& .MuiLinearProgress-bar': { bgcolor: 'success.main' } }}
+                  sx={{ height: 8, borderRadius: 5, bgcolor: '#10A37F33', '& .MuiLinearProgress-bar': { bgcolor: '#10A37F' } }}
                 />
               </Box>
               
               <Box sx={{ mb: 2 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                  <Typography variant="body2">In Progress</Typography>
-                  <Typography variant="body2">{stats.inProgress} of {stats.totalModules}</Typography>
+                  <Typography variant="body2" sx={{ color: "#bbb" }}>In Progress</Typography>
+                  <Typography variant="body2" sx={{ color: "#bbb" }}>{stats.inProgress} of {stats.totalModules}</Typography>
                 </Box>
                 <LinearProgress 
                   variant="determinate" 
                   value={(stats.inProgress / stats.totalModules) * 100} 
-                  sx={{ height: 8, borderRadius: 5, bgcolor: 'primary.light', '& .MuiLinearProgress-bar': { bgcolor: 'primary.main' } }}
+                  sx={{ height: 8, borderRadius: 5, bgcolor: '#6c63ff33', '& .MuiLinearProgress-bar': { bgcolor: '#6c63ff' } }}
                 />
               </Box>
               
               <Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                  <Typography variant="body2">Not Started</Typography>
-                  <Typography variant="body2">{stats.notStarted} of {stats.totalModules}</Typography>
+                  <Typography variant="body2" sx={{ color: "#bbb" }}>Not Started</Typography>
+                  <Typography variant="body2" sx={{ color: "#bbb" }}>{stats.notStarted} of {stats.totalModules}</Typography>
                 </Box>
                 <LinearProgress 
                   variant="determinate" 
                   value={(stats.notStarted / stats.totalModules) * 100} 
-                  sx={{ height: 8, borderRadius: 5, bgcolor: 'grey.200', '& .MuiLinearProgress-bar': { bgcolor: 'grey.500' } }}
+                  sx={{ height: 8, borderRadius: 5, bgcolor: '#393e6e', '& .MuiLinearProgress-bar': { bgcolor: '#bbb' } }}
                 />
               </Box>
             </CardContent>
@@ -201,12 +221,12 @@ const Progress = () => {
       </Grid>
       
       {/* Learning Path Timeline */}
-      <Typography variant="h6" gutterBottom>Your Learning Path</Typography>
+      <Typography variant="h6" gutterBottom sx={{ color: "#fff", fontWeight: 700 }}>Your Learning Path</Typography>
       
       {modules.length === 0 ? (
         <Box sx={{ textAlign: 'center', py: 4 }}>
-          <SchoolIcon sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
-          <Typography variant="body1" color="text.secondary">
+          <SchoolIcon sx={{ fontSize: 60, color: '#393e6e', mb: 2 }} />
+          <Typography variant="body1" sx={{ color: "#bbb" }}>
             No modules available yet.
           </Typography>
         </Box>
@@ -215,7 +235,7 @@ const Progress = () => {
           {modules.map((module, index) => {
             const status = getModuleStatus(module._id);
             const progressPercentage = getProgressPercentage(module._id);
-            
+
             return (
               <Box key={module._id} sx={{ display: 'flex', alignItems: 'flex-start' }}>
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mr: 2 }}>
@@ -227,36 +247,57 @@ const Progress = () => {
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center',
-                      bgcolor: status === 'completed' ? 'success.main' : status === 'in progress' ? 'primary.main' : 'grey.400',
+                      bgcolor: status === 'completed' ? '#10A37F' : status === 'in progress' ? '#6c63ff' : '#393e6e',
                       color: 'white'
                     }}
                   >
                     {status === 'completed' ? <CheckCircleIcon /> : <RadioButtonUncheckedIcon />}
                   </Box>
                   {index < modules.length - 1 && (
-                    <Divider orientation="vertical" flexItem sx={{ height: 50, my: 1 }} />
+                    <Divider orientation="vertical" flexItem sx={{ height: 50, my: 1, background: "#393e6e" }} />
                   )}
                 </Box>
                 
                 <Box sx={{ flex: 1 }}>
-                  <Card variant="outlined" sx={{ mb: 2 }}>
+                  <Card
+                    variant="outlined"
+                    sx={{
+                      mb: 2,
+                      background: "rgba(44, 44, 84, 0.95)",
+                      borderRadius: 3,
+                      color: "#fff",
+                      boxShadow: '0 4px 24px 0 rgba(108,99,255,0.10)',
+                      border: '1.5px solid #393e6e'
+                    }}
+                  >
                     <CardContent>
-                      <Typography variant="h6">{module.title}</Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      <Typography variant="h6" sx={{ color: "#fff", fontWeight: 700 }}>{module.title}</Typography>
+                      <Typography variant="body2" sx={{ color: "#bbb", mb: 1 }}>
                         {module.description}
                       </Typography>
                       
                       {status === 'in progress' && (
                         <Box sx={{ mt: 2 }}>
-                          <LinearProgress variant="determinate" value={progressPercentage} />
-                          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                            {progressPercentage}% complete
-                          </Typography>
+                          <>
+                            <LinearProgress
+                              variant="determinate"
+                              value={progressPercentage}
+                              sx={{
+                                height: 8,
+                                borderRadius: 5,
+                                bgcolor: '#6c63ff33',
+                                '& .MuiLinearProgress-bar': { bgcolor: '#6c63ff' }
+                              }}
+                            />
+                            <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: "#bbb" }}>
+                              {progressPercentage}% complete
+                            </Typography>
+                          </>
                         </Box>
                       )}
-                      
+
                       {status === 'completed' && (
-                        <Typography variant="body2" color="success.main" sx={{ mt: 1, display: 'flex', alignItems: 'center' }}>
+                        <Typography variant="body2" sx={{ mt: 1, display: 'flex', alignItems: 'center', color: "#10A37F" }}>
                           <CheckCircleIcon fontSize="small" sx={{ mr: 0.5 }} /> Completed
                         </Typography>
                       )}

@@ -30,7 +30,6 @@ const Module = () => {
   const navigate = useNavigate();
   
   const [module, setModule] = useState(null);
-  const [userProgress, setUserProgress] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentStep, setCurrentStep] = useState(0);
@@ -64,10 +63,10 @@ const Module = () => {
         if (user && user._id) {
           try {
             const progressResponse = await api.get(`/progress/${user._id}`);
-            const moduleProgress = progressResponse.data.find(p => p.module._id === moduleId);
-            setUserProgress(moduleProgress);
-            
+            // const moduleProgress = progressResponse.data.find(p => p.module._id === moduleId);
+            // setUserProgress(moduleProgress);
             // If module is in progress, set current step accordingly
+            const moduleProgress = progressResponse.data.find(p => p.module._id === moduleId);
             if (moduleProgress && moduleProgress.currentSection) {
               setCurrentStep(moduleProgress.currentSection - 1);
             }
@@ -101,11 +100,11 @@ const Module = () => {
       await api.post('/progress/update', progressData);
       
       // Update local progress state
-      setUserProgress(prev => ({
-        ...prev,
-        status,
-        ...(section && { currentSection: section })
-      }));
+      // setUserProgress(prev => ({
+      //   ...prev,
+      //   status,
+      //   ...(section && { currentSection: section })
+      // }));
     } catch (err) {
       console.error('Error updating progress:', err);
       setError('Failed to update progress. Please try again.');

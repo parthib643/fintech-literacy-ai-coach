@@ -8,6 +8,9 @@ import Dashboard from './components/dashboard/Dashboard';
 import Module from './components/modules/Module';
 import Assessment from './components/modules/Assessment';
 
+import ModuleDetail from './components/modules/ModuleDetail';
+
+
 function App() {
   // Protected route component moved inside App function
   const ProtectedRoute = ({ children }) => {
@@ -42,6 +45,11 @@ function App() {
               <Assessment />
             </ProtectedRoute>
           } />
+
+
+          <Route path="/module-detail/:moduleId" element={<ModuleDetail />} />
+
+
         </Routes>
       </Router>
     </AuthProvider>
